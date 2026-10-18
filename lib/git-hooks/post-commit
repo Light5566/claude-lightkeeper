@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""post-commit (vault repo): back the vault up to its remote after every commit.
+
+The vault lives outside the code repos, often on one machine; this pushes the
+current branch to `origin` right after each commit so the backup is never more
+than one commit behind and nobody has to remember a push.
+
+- Synchronous with a timeout: a push sent to the background can be killed with
+  the shell that ran the commit.
+- Never prompts (GIT_TERMINAL_PROMPT=0): a missing login fails fast instead of
+  hanging the commit.
+- Silent when the push works and when there is no `origin`. On failure it
+  prints one line; the commit has already happened, and the next push retries.
+
+Enabled per clone by `vault init --backup-remote URL` (sets core.hooksPath to
+_meta/git-hooks). Python 3.9, stdlib only.
+"""
+import os
+import subprocess
+import sys
+
+TIMEOUT = 20
+
+
+def git(*args, **kw):
+    return subprocess.run(["git", *args], capture_output=True, text=True, **kw)
+
+
+def reason(stderr):
+    lines = [line.strip() for line in (stderr or "").splitlines() if line.strip()]
+    for prefix in ("fatal:", "error:", "!"):
+        for line in lines:
+            if line.startswith(prefix):
+                return line[len(prefix):].strip()
+    return lines[-1] if lines else ""
+
+
+def main():
+    if git("remote", "get-url", "origin").returncode != 0:
+        return
+    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    try:
+        r = git("push", "-q", "origin", "HEAD", env=env, timeout=TIMEOUT)
+        if r.returncode == 0:
+            return
+        why = reason(r.stderr) or "exit %d" % r.returncode
+    except subprocess.TimeoutExpired:
+        why = "no answer in %ds" % TIMEOUT
+    except OSError as e:
+        why = str(e)
+    sys.stderr.write("vault backup: push failed (%s); the next commit retries, "
+                     "or run: git -C \"%s\" push\n" % (why[:160], os.getcwd()))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:
+        pass
+    sys.exit(0)

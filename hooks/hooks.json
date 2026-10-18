@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "command -v python3 >/dev/null 2>&1 && python3 \"${CLAUDE_PLUGIN_ROOT}/lib/hooks/run.py\" session_start || cat >/dev/null; exit 0", "timeout": 10 }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "command -v python3 >/dev/null 2>&1 && python3 \"${CLAUDE_PLUGIN_ROOT}/lib/hooks/run.py\" prompt_hint || cat >/dev/null; exit 0", "timeout": 10 }] }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "command -v python3 >/dev/null 2>&1 && python3 \"${CLAUDE_PLUGIN_ROOT}/lib/hooks/run.py\" file_guard || cat >/dev/null; exit 0", "timeout": 10 }]
+      }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "command -v python3 >/dev/null 2>&1 && python3 \"${CLAUDE_PLUGIN_ROOT}/lib/hooks/run.py\" stop_reminder || cat >/dev/null; exit 0", "timeout": 15, "statusMessage": "Checking the knowledge vault" }] }
+    ]
+  }
+}

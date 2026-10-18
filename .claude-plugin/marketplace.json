@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-vault",
+  "description": "A knowledge map of your codebase that Claude reads before it edits and updates before it stops.",
+  "owner": { "name": "Light5566", "url": "https://github.com/Light5566" },
+  "plugins": [
+    {
+      "name": "vault",
+      "description": "Obsidian-compatible codebase world map, outside the repo, kept honest by hooks: skills, hooks and a CLI.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
