@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+/dist/
+/demo/_meta/index.json
+/demo/_meta/status.json
