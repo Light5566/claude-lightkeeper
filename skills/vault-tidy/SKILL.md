@@ -24,7 +24,7 @@ Before touching a note, read it in full, and run `vault find <note>` to see who 
 
 - **Regroup and dedupe the Gotchas.** Cluster bullets about the same mechanism under one bullet with sub-points. Merge duplicates. Keep **every specific fact**: the class and method, the value, the symptom. Never drop a trap. If the code no longer does what a Gotcha warns about, verify that against the current code, then move the bullet to *History* as one line naming the release that fixed it, so the fact survives.
 - **A Gotcha that is really a why moves to `6 Decisions`.** If a bullet explains a deliberate choice rather than a trap, write a Decision note from `_templates/Decision.md`, link it from the module's *Connects to* with a reason, and replace the bullet with a one-line pointer.
-- **Fold old History.** Keep the entries for the last five releases. Replace everything older with one line: `- Earlier history: see [[Changelog]] — this note's changes before vX.Y.Z`.
+- **Fold old History.** Keep the entries for the last five releases. Replace everything older with one line: `- Earlier history: see [[Vault Changelog]] — this note's changes before vX.Y.Z`.
 - **Tighten *How it works*** only by removing repetition and dead detours. If a paragraph describes a code path that no longer exists, that is a re-verify, not a trim.
 
 ### Re-verify: stale while its code moved
@@ -54,7 +54,7 @@ vault check --write        # must exit 0; Attention.md shrinks accordingly
 git -C <vault> add -A && git commit -m "tidy: Payment (Gotchas 31→14, 5100→3300 words); re-verified Order"
 ```
 
-Show the user a before/after line per note: word count and Gotcha count. Name every note in the commit message; `vault log <note>` and `Changelog.md` are built from it.
+Show the user a before/after line per note: word count and Gotcha count. Name every note in the commit message; `vault log <note>` and `Vault Changelog.md` are built from it.
 
 A tidy never changes meaning. If you find yourself deciding how something works, stop: that is a re-verify, and the code decides.
 

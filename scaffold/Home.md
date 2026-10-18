@@ -82,4 +82,4 @@ Obsidian Bases over the frontmatter, in `_meta/views`. They read the notes live;
 
 ## Honesty
 
-This vault is only worth what it is worth if it is true. Each note records what was true when it was last `updated`. If the code disagrees, the code wins and the note gets fixed. `status: shipped` means the code is on the production branch named in `vault.json`; anything else is `in-progress`, `planned` or `deprecated`. `depth: stub` means the note is thin, not that the module is small. [[Coverage]] counts the stubs, [[Attention]] lists what needs a human, and [[Changelog]] shows what the vault itself learned and when.
+This vault is only worth what it is worth if it is true. Each note records what was true when it was last `updated`. If the code disagrees, the code wins and the note gets fixed. `status: shipped` means the code is on the production branch named in `vault.json`; anything else is `in-progress`, `planned` or `deprecated`. `depth: stub` means the note is thin, not that the module is small. [[Coverage]] counts the stubs, [[Attention]] lists what needs a human, and [[Vault Changelog]] shows what the vault itself learned and when.

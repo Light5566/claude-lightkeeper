@@ -4,3 +4,4 @@ __pycache__/
 /dist/
 /demo/_meta/index.json
 /demo/_meta/status.json
+.claude/

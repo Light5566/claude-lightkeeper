@@ -118,7 +118,7 @@ The scaffold's `_meta/Conventions.md` and `_meta/How to update.md` hold the full
 vault find <terms>              topic search, tiered: names → aliases/flags → tags → full text
 vault find --paths <files>      which notes own these files
 vault check [--write]           lint; --write also rebuilds the index and regenerates
-                                Coverage.md, Changelog.md, Attention.md and World.canvas
+                                Coverage.md, Vault Changelog.md, Attention.md and World.canvas
 vault status                    coverage, stale notes, attention, sync drift on one screen
 vault sync [target] [--advance] what landed on the repos since the vault last caught up
 vault log <note>                that note's git history
@@ -183,7 +183,7 @@ The vault is its own git repo. Share it the way you share code:
 
 The session primer mentions the count once a day. `/vault:tidy` works the list: it regroups and dedupes Gotchas without dropping a single trap, re-reads the diff behind a stale note before confirming or fixing it, and promotes stubs from the code.
 
-`_meta/Changelog.md` is derived from the vault's git history on every `--write`, so the history of what the map learned, and when, is never hand-kept. `World.canvas` is regenerated the same way: one group per domain, modules inside, cross-domain links with their reasons.
+`_meta/Vault Changelog.md` is derived from the vault's git history on every `--write`, so the history of what the map learned, and when, is never hand-kept. `World.canvas` is regenerated the same way: one group per domain, modules inside, cross-domain links with their reasons.
 
 ## Compatibility
 

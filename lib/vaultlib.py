@@ -276,9 +276,30 @@ def build_index(root=None):
             _known[c] = (names, wts)
         return _known[c]
 
+    _suffix = {}
+
+    def by_suffix(val):
+        """A relative claim that matches exactly one committed path's tail
+        (`Admin/Thing.php` -> `app/Http/Controllers/Admin/Thing.php`)."""
+        base = val.rsplit("/", 1)[-1]
+        hits = []
+        for c in checkouts:
+            names, _wts = known(c)
+            if c not in _suffix:
+                m = {}
+                for n in names:
+                    m.setdefault(n.rsplit("/", 1)[-1], []).append(n)
+                _suffix[c] = m
+            for n in _suffix[c].get(base, []):
+                if n.endswith("/" + val) and n not in hits:
+                    hits.append(n)
+        return hits[0] if len(hits) == 1 else None
+
     def plausible(path):
         if not checkouts:
             return True
+        if os.path.exists(os.path.join(str(root), path)):
+            return True  # the vault's own files (tooling notes cite them)
         for c in checkouts:
             if os.path.exists(os.path.join(c, path)):
                 return True
@@ -342,6 +363,19 @@ def build_index(root=None):
                         if kind in ("path", "dir"):
                             if kind == "dir" and val in GENERIC_DIRS:
                                 continue
+                            # A sibling cell written relative to the row's first path
+                            # (`Sub/Thing.php` after `app/Http/Controllers/Thing.php`)
+                            # resolves against that directory and its parents.
+                            if (checkouts and current_dir and not plausible(val)
+                                    and val.split("/", 1)[0] not in PATH_ROOTS):
+                                parts = current_dir.split("/")
+                                for i in range(len(parts), 0, -1):
+                                    cand = "/".join(parts[:i]) + "/" + val
+                                    if plausible(cand):
+                                        val = cand
+                                        break
+                            if checkouts and not plausible(val):
+                                val = by_suffix(val) or val
                             claims.add(val)
                             add(paths, val, stem)
                             if kind == "dir" and not ("/" not in val and val in PATH_ROOTS):
@@ -388,7 +422,9 @@ def build_index(root=None):
         # Links are detected with inline code spans removed (a backticked
         # [[link]] is not a link — same rule as check.py); the reason text
         # keeps span CONTENT, only the backticks go.
-        stripped = strip_fences(text)
+        # Tooling notes under _meta/ (Coverage, Attention, local rules) list other
+        # notes but are not part of the map: no edges, no inbound counts from them.
+        stripped = "" if is_meta_note else strip_fences(text)
         current_section = None
         for line in stripped.splitlines():
             if line.startswith("## "):

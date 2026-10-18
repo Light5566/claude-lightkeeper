@@ -111,7 +111,8 @@ out=$(cd "$tmp" && python3 "$here/lib/find.py" anything 2>&1); rc=$?
 [ $rc -ne 0 ] && expect_in "find outside any vault explains" "no vault covers" "$out" || bad "find outside any vault explains" "$out"
 echo "x@acme-corp.com" >> "$tmp/vault/2 Modules/Order.md"
 out=$(python3 "$here/lib/check.py" --vault "$tmp/vault" 2>&1); rc=$?
-[ $rc -ne 0 ] && expect_in "secrets rule catches an email" "email address" "$out" || bad "secrets rule catches an email" "$out"
+[ $rc -eq 0 ] && expect_in "secrets rule warns on an email" "email address" "$out" || bad "secrets rule warns on an email" "$out"
+python3 "$here/lib/check.py" --vault "$tmp/vault" --strict >/dev/null 2>&1 && bad "secrets rule fails under --strict" "" || ok "secrets rule fails under --strict"
 sed -i.bak '/x@acme-corp.com/d' "$tmp/vault/2 Modules/Order.md"; rm -f "$tmp/vault/2 Modules/Order.md.bak"
 python3 "$here/lib/check.py" --vault "$tmp/vault" --write >/dev/null 2>&1
 
@@ -124,7 +125,7 @@ expect_in "re-verify signal (stale while code moved)" "re-verify.*Payment" "$att
 expect_in "path rot signal (claimed path missing)" "path rot.*Order" "$att"
 expect_in "status.json carries the count" '"count": 2' "$(cat "$tmp/vault/_meta/status.json")"
 expect_in "vault status prints attention" "attention: 2" "$(python3 "$here/lib/status.py" --vault "$tmp/vault" 2>&1)"
-[ -f "$tmp/vault/_meta/Changelog.md" ] && ok "Changelog written" || bad "Changelog written" ""
+[ -f "$tmp/vault/_meta/Vault Changelog.md" ] && ok "Vault Changelog written" || bad "Vault Changelog written" ""
 [ -f "$tmp/vault/World.canvas" ] && python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$tmp/vault/World.canvas" && ok "World.canvas is valid JSON" || bad "World.canvas is valid JSON" ""
 
 # --- hooks (run.py with synthetic payloads, project = the fake checkout)

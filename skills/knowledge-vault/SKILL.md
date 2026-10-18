@@ -102,7 +102,7 @@ Nothing about the canvas. `vault check --write` regenerates `World.canvas` from 
 ├── 8 Repos/           ← one orientation note per codebase
 ├── _templates/        ← copy these
 └── _meta/             ← Conventions, How to update, vault.json, local.md (optional),
-                         Coverage.md, Changelog.md, Attention.md, views/ (generated),
+                         Coverage.md, Vault Changelog.md, Attention.md (generated), views/,
                          index.json (generated, gitignored)
 ```
 
@@ -191,7 +191,7 @@ When a version reaches the production branch:
 vault check --write
 ```
 
-Works from any directory. It checks that every `[[link]]` resolves (aliases count); catches duplicate filenames, alias collisions, bare links, container-directory claims and malformed frontmatter; lists orphans and stale notes; regenerates `_meta/Coverage.md`, `_meta/Changelog.md`, `_meta/Attention.md` and `World.canvas`; and rebuilds the search index. It exits non-zero on any problem and must exit 0 before you commit.
+Works from any directory. It checks that every `[[link]]` resolves (aliases count); catches duplicate filenames, alias collisions, bare links, container-directory claims and malformed frontmatter; lists orphans and stale notes; regenerates `_meta/Coverage.md`, `_meta/Vault Changelog.md`, `_meta/Attention.md` and `World.canvas`; and rebuilds the search index. It exits non-zero on any problem and must exit 0 before you commit.
 
 Then commit. The vault is its own git repo and needs its own commit:
 
@@ -199,7 +199,7 @@ Then commit. The vault is its own git repo and needs its own commit:
 git -C <vault> add -A && git commit -m "Payment: capture retries; Gotcha on webhook ordering"
 ```
 
-Name the notes in the message. `vault log <note>` reads that history back, and `Changelog.md` is built from it. The vault commit is separate from the code commit; whatever rule you follow for committing code still applies to the code repo.
+Name the notes in the message. `vault log <note>` reads that history back, and `Vault Changelog.md` is built from it. The vault commit is separate from the code commit; whatever rule you follow for committing code still applies to the code repo.
 
 ---
 

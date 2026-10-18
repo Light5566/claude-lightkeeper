@@ -227,6 +227,8 @@ const sim = d3.forceSimulation(nodes)
   .force('charge', d3.forceManyBody().strength(-160))
   .force('collide', d3.forceCollide(d => radius(d) + 4))
   .force('center', d3.forceCenter(0, 0))
+  .force('x', d3.forceX(0).strength(0.04))   // keep unlinked notes near the rest
+  .force('y', d3.forceY(0).strength(0.04))
   .on('tick', draw)
   .stop();
 sim.tick(300);                      // settle synchronously: first paint is the final layout
