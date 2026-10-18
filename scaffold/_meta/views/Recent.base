@@ -1,0 +1,22 @@
+# The 50 most recently updated typed notes.
+filters:
+  not:
+    - file.inFolder("_meta")
+    - file.inFolder("_templates")
+views:
+  - type: table
+    name: Recent
+    filters:
+      and:
+        - '!type.isEmpty()'
+    limit: 50
+    order:
+      - file.name
+      - note.type
+      - note.status
+      - note.updated
+    sort:
+      - property: note.updated
+        direction: DESC
+      - property: file.name
+        direction: ASC

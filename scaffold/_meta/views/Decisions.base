@@ -1,0 +1,21 @@
+# Decision records, newest decision first.
+filters:
+  not:
+    - file.inFolder("_meta")
+    - file.inFolder("_templates")
+views:
+  - type: table
+    name: Decisions
+    filters:
+      and:
+        - 'type == "decision"'
+    order:
+      - file.name
+      - note.status
+      - note.date
+      - note.updated
+    sort:
+      - property: note.date
+        direction: DESC
+      - property: file.name
+        direction: ASC

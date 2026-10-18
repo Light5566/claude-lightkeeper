@@ -141,7 +141,8 @@ def copy_scaffold(dest, name):
         target.parent.mkdir(parents=True, exist_ok=True)
         if src.suffix in (".md", ".base", ".canvas", ".json") and src.name != "vault.json":
             text = src.read_text()
-            target.write_text(text.replace("{{name}}", name))
+            target.write_text(text.replace("{{name}}", name)
+                              .replace("{{date}}", datetime.date.today().isoformat()))
         else:
             shutil.copy2(src, target)
 

@@ -1,0 +1,24 @@
+# Code-describing notes, oldest update first: the ones most likely to have drifted from the code.
+filters:
+  not:
+    - file.inFolder("_meta")
+    - file.inFolder("_templates")
+views:
+  - type: table
+    name: Stale
+    filters:
+      or:
+        - 'type == "module"'
+        - 'type == "flow"'
+        - 'type == "integration"'
+        - 'type == "platform"'
+    order:
+      - file.name
+      - note.type
+      - note.updated
+      - note.depth
+    sort:
+      - property: note.updated
+        direction: ASC
+      - property: file.name
+        direction: ASC

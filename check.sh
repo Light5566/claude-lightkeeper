@@ -166,5 +166,14 @@ expect_in "vault log through the launcher" "Payment — 2 Modules/Payment.md" "$
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" sync --no-fetch 2>&1)
 expect_in "sync defaults to this checkout's target" "== repo ==" "$out"
 
+# --- export + release
+out=$(CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --vault "$tmp/vault" --out "$tmp/map.html" 2>&1)
+grep -q "<html" "$tmp/map.html" 2>/dev/null && grep -q "Payment" "$tmp/map.html" && ok "vault export --html writes a page with the notes" || bad "vault export --html writes a page with the notes" "$out"
+git -C "$repo" tag v0.1 "$(git -C "$repo" rev-list --max-parents=0 HEAD)"
+out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" release v0.2 --json 2>&1)
+expect_in "vault release finds the window since the previous tag" '"since": "v0.1"' "$out"
+expect_in "vault release groups files by owning note" '"Payment"' "$out"
+grep -q "{{" "$tmp/vault/Home.md" && bad "scaffold placeholders substituted" "$(grep -n '{{' "$tmp/vault/Home.md" | head -3)" || ok "scaffold placeholders substituted"
+
 [ $fail -eq 0 ] && echo "all checks passed" || echo "SOME CHECKS FAILED"
 exit $fail
