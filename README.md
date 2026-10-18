@@ -168,6 +168,7 @@ The vault is its own git repo. Share it the way you share code:
 - Colleagues' pushes arrive with no hook attached, so the map drifts. `vault sync` reports everything that landed on each repo since the vault last caught up, grouped by the notes that own the changed files, and the `vault-sync` skill walks the catch-up. Advance the cursor only after the notes are updated.
 - The `post-merge` and `pre-push` git hooks that `vault init --git-hook` installs print how far the vault is behind the branch. They never block, and they work for teammates who do not use Claude.
 - `vault init --backup-remote <url>` makes every vault commit push itself, so a one-machine vault is never more than a commit behind its backup.
+- **The PR comment bot.** `uses: Light5566/claude-vault/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, and lists files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
 
 ## Keeping the map honest
 

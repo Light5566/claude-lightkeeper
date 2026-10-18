@@ -176,5 +176,15 @@ expect_in "vault release finds the window since the previous tag" '"since": "v0.
 expect_in "vault release groups files by owning note" '"Payment"' "$out"
 grep -q "{{" "$tmp/vault/Home.md" && bad "scaffold placeholders substituted" "$(grep -n '{{' "$tmp/vault/Home.md" | head -3)" || ok "scaffold placeholders substituted"
 
+# --- PR notes action renderer
+printf '%s\n' app/Services/PaymentService.php composer.lock app/Services/NewThing.php > "$tmp/changed.txt"
+out=$(python3 "$here/action/pr_notes.py" --vault "$tmp/vault" --files "$tmp/changed.txt" --repo "$repo" 2>&1)
+expect_in "pr_notes starts with the marker" "^<!-- claude-vault -->" "$out"
+expect_in "pr_notes names the owning note" "\*\*Payment\*\*" "$out"
+expect_in "pr_notes lists the unmatched file" "NewThing.php" "$out"
+grep -q "composer.lock" <<<"$out" && bad "pr_notes skips noise files" "$out" || ok "pr_notes skips noise files"
+out=$(python3 "$here/action/pr_notes.py" --vault "$tmp/nowhere" --files "$tmp/changed.txt" --repo "$repo" 2>&1); rc=$?
+[ $rc -eq 0 ] && expect_in "pr_notes never fails without a vault" "Could not read the vault" "$out" || bad "pr_notes never fails without a vault" "$out"
+
 [ $fail -eq 0 ] && echo "all checks passed" || echo "SOME CHECKS FAILED"
 exit $fail

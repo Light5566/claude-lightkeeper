@@ -1,0 +1,22 @@
+# The plugin uses its own PR action against the demo vault in demo/: a pull
+# request here gets a comment listing which demo notes own the changed files
+# (usually none, since the demo maps BookStack, not this repo). It is the live
+# proof that the action's plumbing works.
+name: vault notes
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./action
+        with:
+          vault_repo: ${{ github.repository }}
+          vault_ref: ${{ github.event.pull_request.base.ref }}
+          vault_path: demo
