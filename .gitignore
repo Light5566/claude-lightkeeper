@@ -5,3 +5,4 @@ __pycache__/
 /demo/_meta/index.json
 /demo/_meta/status.json
 .claude/
+/launch/

@@ -240,19 +240,20 @@ const zoom = d3.zoom().scaleExtent([0.08, 8]).on('zoom', e => {
 });
 svg.call(zoom).on('click', () => select(null));
 let fitted = true;
-fit();
+fit(false);                         // first paint lands fitted; later fits animate
 
 function size() {               // falls back to the window: a hidden page reports a 0x0 svg
   const r = svg.node().getBoundingClientRect();
   return [r.width || window.innerWidth, r.height || window.innerHeight];
 }
-function fit() {
+function fit(animate = true) {
   const [w, h] = size();
   const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
   const x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
   const k = Math.min(1, 0.9 * Math.min(w / (x1 - x0 + 1), h / (y1 - y0 + 1)));
   if (!(k > 0 && isFinite(k))) { fitted = false; return; }   // retried on the next resize
-  svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(w / 2, h / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  const target = d3.zoomIdentity.translate(w / 2, h / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+  (animate ? svg.transition().duration(500) : svg).call(zoom.transform, target);
 }
 function centerOn(n) {
   const [w, h] = size(), k = Math.max(d3.zoomTransform(svg.node()).k, 0.8);

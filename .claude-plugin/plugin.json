@@ -1,6 +1,6 @@
 {
   "name": "vault",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "An Obsidian-compatible knowledge map of your codebase, kept outside the repo and kept honest by Claude Code hooks: read the map before editing, update it before stopping.",
   "author": {
     "name": "Light5566",

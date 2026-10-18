@@ -2,6 +2,10 @@
 
 **A knowledge map of your codebase that Claude reads before it edits and updates before it stops.**
 
+[English](README.md) · [中文](README.zh.md) · [Live demo](https://light5566.github.io/claude-vault/) (a map of BookStack, built with `/vault:seed`) · [Changelog](CHANGELOG.md)
+
+![The pre-edit pointer and the Stop reminder firing in a Claude Code session](docs/assets/hooks.png)
+
 claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
 
 - a **session primer** that tells the agent the map exists and how to query it,
@@ -11,6 +15,8 @@ claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown m
 - **maintenance signals** that say which notes have grown too long, gone stale while their code moved, or claim files that no longer exist.
 
 It is the [LLM-wiki pattern](https://www.noze.it/en/insights/llm-wiki/) applied to a codebase, kept honest by hooks. Ten months of daily use across three production codebases: 464 notes, 4,500 reasoned links.
+
+![The interactive map exported from the demo vault](docs/assets/map.png)
 
 ```
 $ vault find payment timeout
