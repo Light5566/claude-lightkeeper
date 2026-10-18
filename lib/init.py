@@ -250,6 +250,14 @@ def fresh(path, name, repos, opts):
         (dest / f).mkdir(exist_ok=True)
     for key, entry, _c, _h in repos:
         (dest / "8 Repos" / (key + ".md")).write_text(repo_stub(key, entry))
+    home = dest / "Home.md"
+    if home.exists() and repos:
+        # link every repo note from the entry page so none starts as an orphan
+        links = ", ".join("[[%s]]" % k for k, _e, _c, _h in repos)
+        text = home.read_text()
+        marker = "one orientation note per codebase in `8 Repos`."
+        home.write_text(text.replace(marker, "one orientation note per codebase in `8 Repos`: %s." % links, 1)
+                        if marker in text else text.rstrip("\n") + "\n\n## Repos\n\n%s\n" % links)
     if not (dest / "Home.md").exists():
         (dest / "Home.md").write_text("---\ntype: meta\nupdated: %s\ntags: [meta]\n---\n\n# %s\n\n"
                                       "The world map of %s.\n" % (datetime.date.today().isoformat(), name, name))

@@ -1,0 +1,24 @@
+{
+  "name": "BookStack",
+  "repos": {
+    "BookStack": {
+      "remote": "github.com/bookstackapp/bookstack",
+      "watched": [
+        "app",
+        "routes",
+        "resources/views",
+        "database/migrations"
+      ],
+      "production_ref": "origin/development"
+    }
+  },
+  "generic_dirs": [],
+  "noise_files": [],
+  "stop_window_hours": 6,
+  "tidy": {
+    "max_words": 4000,
+    "max_gotchas": 20,
+    "stale_days": 60,
+    "churn_commits": 5
+  }
+}

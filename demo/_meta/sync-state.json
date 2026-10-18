@@ -1,0 +1,10 @@
+{
+  "targets": [
+    {
+      "name": "BookStack",
+      "path": "~/code/BookStack",
+      "ref": "origin/development",
+      "last": "887eeb64e9cca54f9eda77767df0178d194a7913"
+    }
+  ]
+}

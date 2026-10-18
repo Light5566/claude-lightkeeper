@@ -1,0 +1,583 @@
+{
+	"nodes": [
+		{
+			"id": "g_apitheming",
+			"type": "group",
+			"label": "API & Theming",
+			"color": "1",
+			"x": 0,
+			"y": 0,
+			"width": 740,
+			"height": 220
+		},
+		{
+			"id": "n_restapi",
+			"type": "file",
+			"file": "2 Modules/REST API.md",
+			"x": 45,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_themesystem",
+			"type": "file",
+			"file": "2 Modules/Theme System.md",
+			"x": 395,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_accesspermissions",
+			"type": "group",
+			"label": "Access & Permissions",
+			"color": "2",
+			"x": 1040,
+			"y": 0,
+			"width": 1440,
+			"height": 400
+		},
+		{
+			"id": "n_authentication",
+			"type": "file",
+			"file": "2 Modules/Authentication.md",
+			"x": 1085,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_entitypermissions",
+			"type": "file",
+			"file": "2 Modules/Entity Permissions.md",
+			"x": 1435,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_multifactorauthentication",
+			"type": "file",
+			"file": "2 Modules/Multi-factor Authentication.md",
+			"x": 1785,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_roles",
+			"type": "file",
+			"file": "2 Modules/Roles.md",
+			"x": 2135,
+			"y": 45,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_singlesignon",
+			"type": "file",
+			"file": "2 Modules/Single Sign-on.md",
+			"x": 1085,
+			"y": 225,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_userinvites",
+			"type": "file",
+			"file": "2 Modules/User Invites.md",
+			"x": 1435,
+			"y": 225,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_activityintegrations",
+			"type": "group",
+			"label": "Activity & Integrations",
+			"color": "3",
+			"x": 0,
+			"y": 550,
+			"width": 1440,
+			"height": 400
+		},
+		{
+			"id": "n_activitylog",
+			"type": "file",
+			"file": "2 Modules/Activity Log.md",
+			"x": 45,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_comments",
+			"type": "file",
+			"file": "2 Modules/Comments.md",
+			"x": 395,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_favourites",
+			"type": "file",
+			"file": "2 Modules/Favourites.md",
+			"x": 745,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_tags",
+			"type": "file",
+			"file": "2 Modules/Tags.md",
+			"x": 1095,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_watchingnotifications",
+			"type": "file",
+			"file": "2 Modules/Watching & Notifications.md",
+			"x": 45,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_webhooks",
+			"type": "file",
+			"file": "2 Modules/Webhooks.md",
+			"x": 395,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_content",
+			"type": "group",
+			"label": "Content",
+			"color": "4",
+			"x": 1740,
+			"y": 550,
+			"width": 1440,
+			"height": 400
+		},
+		{
+			"id": "n_books",
+			"type": "file",
+			"file": "2 Modules/Books.md",
+			"x": 1785,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_bookshelves",
+			"type": "file",
+			"file": "2 Modules/Bookshelves.md",
+			"x": 2135,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_chapters",
+			"type": "file",
+			"file": "2 Modules/Chapters.md",
+			"x": 2485,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_pagerevisions",
+			"type": "file",
+			"file": "2 Modules/Page Revisions.md",
+			"x": 2835,
+			"y": 595,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_pagetemplates",
+			"type": "file",
+			"file": "2 Modules/Page Templates.md",
+			"x": 1785,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_pages",
+			"type": "file",
+			"file": "2 Modules/Pages.md",
+			"x": 2135,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_recyclebin",
+			"type": "file",
+			"file": "2 Modules/Recycle Bin.md",
+			"x": 2485,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_sortrules",
+			"type": "file",
+			"file": "2 Modules/Sort Rules.md",
+			"x": 2835,
+			"y": 775,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_exportimport",
+			"type": "group",
+			"label": "Export & Import",
+			"color": "5",
+			"x": 0,
+			"y": 1100,
+			"width": 740,
+			"height": 220
+		},
+		{
+			"id": "n_exports",
+			"type": "file",
+			"file": "2 Modules/Exports.md",
+			"x": 45,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_import",
+			"type": "file",
+			"file": "2 Modules/Import.md",
+			"x": 395,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_media",
+			"type": "group",
+			"label": "Media",
+			"color": "6",
+			"x": 1040,
+			"y": 1100,
+			"width": 740,
+			"height": 220
+		},
+		{
+			"id": "n_attachments",
+			"type": "file",
+			"file": "2 Modules/Attachments.md",
+			"x": 1085,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_images",
+			"type": "file",
+			"file": "2 Modules/Images.md",
+			"x": 1435,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_searchreferences",
+			"type": "group",
+			"label": "Search & References",
+			"color": "1",
+			"x": 2080,
+			"y": 1100,
+			"width": 740,
+			"height": 220
+		},
+		{
+			"id": "n_references",
+			"type": "file",
+			"file": "2 Modules/References.md",
+			"x": 2125,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_search",
+			"type": "file",
+			"file": "2 Modules/Search.md",
+			"x": 2475,
+			"y": 1145,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "g_userssettings",
+			"type": "group",
+			"label": "Users & Settings",
+			"color": "2",
+			"x": 0,
+			"y": 1470,
+			"width": 1440,
+			"height": 400
+		},
+		{
+			"id": "n_auditlog",
+			"type": "file",
+			"file": "2 Modules/Audit Log.md",
+			"x": 45,
+			"y": 1515,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_maintenance",
+			"type": "file",
+			"file": "2 Modules/Maintenance.md",
+			"x": 395,
+			"y": 1515,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_settings",
+			"type": "file",
+			"file": "2 Modules/Settings.md",
+			"x": 745,
+			"y": 1515,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_userpreferences",
+			"type": "file",
+			"file": "2 Modules/User Preferences.md",
+			"x": 1095,
+			"y": 1515,
+			"width": 300,
+			"height": 130
+		},
+		{
+			"id": "n_users",
+			"type": "file",
+			"file": "2 Modules/Users.md",
+			"x": 45,
+			"y": 1695,
+			"width": 300,
+			"height": 130
+		}
+	],
+	"edges": [
+		{
+			"id": "e0",
+			"fromNode": "n_activitylog",
+			"fromSide": "right",
+			"toNode": "n_auditlog",
+			"toSide": "left",
+			"label": "the admin listing reads this table"
+		},
+		{
+			"id": "e1",
+			"fromNode": "n_attachments",
+			"fromSide": "right",
+			"toNode": "n_entitypermissions",
+			"toSide": "left",
+			"label": "downloading an attachment checks the page's permission"
+		},
+		{
+			"id": "e2",
+			"fromNode": "n_attachments",
+			"fromSide": "right",
+			"toNode": "n_pages",
+			"toSide": "left",
+			"label": "an attachment belongs to one page"
+		},
+		{
+			"id": "e3",
+			"fromNode": "n_auditlog",
+			"fromSide": "right",
+			"toNode": "n_activitylog",
+			"toSide": "left",
+			"label": "the audit log is a filtered listing of activities"
+		},
+		{
+			"id": "e4",
+			"fromNode": "n_books",
+			"fromSide": "right",
+			"toNode": "n_exports",
+			"toSide": "left",
+			"label": "a book can be exported whole as HTML, PDF or ZIP"
+		},
+		{
+			"id": "e5",
+			"fromNode": "n_bookshelves",
+			"fromSide": "right",
+			"toNode": "n_entitypermissions",
+			"toSide": "left",
+			"label": "shelf permissions can be copied down to the books on it"
+		},
+		{
+			"id": "e6",
+			"fromNode": "n_comments",
+			"fromSide": "right",
+			"toNode": "n_pages",
+			"toSide": "left",
+			"label": "comments belong to a page"
+		},
+		{
+			"id": "e7",
+			"fromNode": "n_exports",
+			"fromSide": "right",
+			"toNode": "n_books",
+			"toSide": "left",
+			"label": "ExportFormatter::bookToContainedHtml() walks the book's…"
+		},
+		{
+			"id": "e8",
+			"fromNode": "n_favourites",
+			"fromSide": "right",
+			"toNode": "n_users",
+			"toSide": "left",
+			"label": "favourites are per user"
+		},
+		{
+			"id": "e9",
+			"fromNode": "n_images",
+			"fromSide": "right",
+			"toNode": "n_pages",
+			"toSide": "left",
+			"label": "page content embeds gallery images"
+		},
+		{
+			"id": "e10",
+			"fromNode": "n_maintenance",
+			"fromSide": "right",
+			"toNode": "n_references",
+			"toSide": "left",
+			"label": "the regenerate-references action rebuilds cross-links"
+		},
+		{
+			"id": "e11",
+			"fromNode": "n_pages",
+			"fromSide": "right",
+			"toNode": "n_activitylog",
+			"toSide": "left",
+			"label": "PageRepo records PAGE_UPDATE through Activity::add()"
+		},
+		{
+			"id": "e12",
+			"fromNode": "n_pages",
+			"fromSide": "right",
+			"toNode": "n_references",
+			"toSide": "left",
+			"label": "ReferenceUpdater rewrites cross-links when a page changes"
+		},
+		{
+			"id": "e13",
+			"fromNode": "n_restapi",
+			"fromSide": "right",
+			"toNode": "n_users",
+			"toSide": "left",
+			"label": "API tokens belong to a user and carry its permissions"
+		},
+		{
+			"id": "e14",
+			"fromNode": "n_references",
+			"fromSide": "right",
+			"toNode": "n_pages",
+			"toSide": "left",
+			"label": "PageRepo calls ReferenceUpdater on save"
+		},
+		{
+			"id": "e15",
+			"fromNode": "n_roles",
+			"fromSide": "right",
+			"toNode": "n_users",
+			"toSide": "left",
+			"label": "a user's access is the union of their roles"
+		},
+		{
+			"id": "e16",
+			"fromNode": "n_search",
+			"fromSide": "right",
+			"toNode": "n_entitypermissions",
+			"toSide": "left",
+			"label": "results are filtered by the joint permissions of the…"
+		},
+		{
+			"id": "e17",
+			"fromNode": "n_search",
+			"fromSide": "right",
+			"toNode": "n_pages",
+			"toSide": "left",
+			"label": "page content is tokenised into search terms"
+		},
+		{
+			"id": "e18",
+			"fromNode": "n_settings",
+			"fromSide": "right",
+			"toNode": "n_themesystem",
+			"toSide": "left",
+			"label": "custom head content and theme settings are read alongside…"
+		},
+		{
+			"id": "e19",
+			"fromNode": "n_tags",
+			"fromSide": "right",
+			"toNode": "n_search",
+			"toSide": "left",
+			"label": "tags are a search filter"
+		},
+		{
+			"id": "e20",
+			"fromNode": "n_themesystem",
+			"fromSide": "right",
+			"toNode": "n_settings",
+			"toSide": "left",
+			"label": "custom head content is configured in settings"
+		},
+		{
+			"id": "e21",
+			"fromNode": "n_userinvites",
+			"fromSide": "right",
+			"toNode": "n_users",
+			"toSide": "left",
+			"label": "an invite completes a user record an admin created"
+		},
+		{
+			"id": "e22",
+			"fromNode": "n_userpreferences",
+			"fromSide": "right",
+			"toNode": "n_watchingnotifications",
+			"toSide": "left",
+			"label": "notification preferences decide which activity emails a user"
+		},
+		{
+			"id": "e23",
+			"fromNode": "n_users",
+			"fromSide": "right",
+			"toNode": "n_roles",
+			"toSide": "left",
+			"label": "users are assigned roles"
+		},
+		{
+			"id": "e24",
+			"fromNode": "n_watchingnotifications",
+			"fromSide": "right",
+			"toNode": "n_userpreferences",
+			"toSide": "left",
+			"label": "a user's notification preferences gate the emails"
+		}
+	]
+}

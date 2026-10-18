@@ -1,0 +1,23 @@
+# Module notes by domain: which modules exist, how deep each is documented, when it was last touched.
+filters:
+  not:
+    - file.inFolder("_meta")
+    - file.inFolder("_templates")
+views:
+  - type: table
+    name: Coverage
+    filters:
+      and:
+        - 'type == "module"'
+    groupBy:
+      property: note.domain
+      direction: ASC
+    order:
+      - file.name
+      - note.status
+      - note.depth
+      - note.domain
+      - note.updated
+    sort:
+      - property: file.name
+        direction: ASC

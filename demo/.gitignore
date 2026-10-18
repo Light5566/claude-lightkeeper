@@ -1,0 +1,13 @@
+# Obsidian per-device UI state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.DS_Store
+.trash/
+
+# Generated search index and status cache (vault check --write). Keep them
+# ignored: the Stop reminder goes quiet while the vault is dirty, and a tracked
+# auto-rebuilt index would keep it dirty forever.
+_meta/index.json
+_meta/status.json
+__pycache__/
+*.pyc
