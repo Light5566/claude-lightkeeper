@@ -2,6 +2,11 @@
 
 All notable changes to claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.1.4 - 2026-10-19
+
+### Fixed
+- New vaults now get the Obsidian settings the README promised: the graph colour groups, the core plugins (Properties, Bases, canvas, templates) and the templates folder. They were missing from the scaffold, so the graph opened grey. The demo vault has them too.
+
 ## 2.1.3 - 2026-10-19
 
 ### Fixed

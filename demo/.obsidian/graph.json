@@ -1,0 +1,92 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": false,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "\"status: deprecated\" -path:\"_meta\"",
+      "color": {
+        "a": 1,
+        "rgb": 11534368
+      }
+    },
+    {
+      "query": "\"depth: stub\" -path:\"_templates\" -path:\"_meta\" -\"status: deprecated\"",
+      "color": {
+        "a": 1,
+        "rgb": 6583435
+      }
+    },
+    {
+      "query": "path:\"2 Modules\" -\"depth: stub\"",
+      "color": {
+        "a": 1,
+        "rgb": 16739098
+      }
+    },
+    {
+      "query": "path:\"1 Domains\"",
+      "color": {
+        "a": 1,
+        "rgb": 16725855
+      }
+    },
+    {
+      "query": "path:\"3 Flows\"",
+      "color": {
+        "a": 1,
+        "rgb": 3458905
+      }
+    },
+    {
+      "query": "path:\"4 Integrations\" -\"depth: stub\"",
+      "color": {
+        "a": 1,
+        "rgb": 689407
+      }
+    },
+    {
+      "query": "path:\"5 Platform\"",
+      "color": {
+        "a": 1,
+        "rgb": 11490014
+      }
+    },
+    {
+      "query": "path:\"6 Decisions\"",
+      "color": {
+        "a": 1,
+        "rgb": 16766474
+      }
+    },
+    {
+      "query": "path:\"7 Releases\"",
+      "color": {
+        "a": 1,
+        "rgb": 9342611
+      }
+    },
+    {
+      "query": "path:\"8 Repos\"",
+      "color": {
+        "a": 1,
+        "rgb": 3190983
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
+  "textFadeMultiplier": -0.6,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.445225694444444,
+  "repelStrength": 10,
+  "linkStrength": 0.792795138888889,
+  "linkDistance": 250,
+  "close": false
+}

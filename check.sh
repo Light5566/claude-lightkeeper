@@ -175,6 +175,7 @@ out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" releas
 expect_in "vault release finds the window since the previous tag" '"since": "v0.1"' "$out"
 expect_in "vault release groups files by owning note" '"Payment"' "$out"
 grep -q "{{" "$tmp/vault/Home.md" && bad "scaffold placeholders substituted" "$(grep -n '{{' "$tmp/vault/Home.md" | head -3)" || ok "scaffold placeholders substituted"
+python3 -c "import json,sys; assert len(json.load(open(sys.argv[1]))['colorGroups']) >= 10" "$tmp/vault/.obsidian/graph.json" 2>/dev/null && ok "new vault gets the Obsidian graph colours" || bad "new vault gets the Obsidian graph colours" "$(ls -a "$tmp/vault/.obsidian" 2>&1)"
 
 # --- PR notes action renderer
 printf '%s\n' app/Services/PaymentService.php composer.lock app/Services/NewThing.php > "$tmp/changed.txt"
