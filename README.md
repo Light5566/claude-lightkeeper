@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-vault/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
-![A Claude Code session: the Stop reminder names the note the edit made stale, and Claude updates it](docs/assets/demo.gif)
+![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo.gif)
 
 claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
 
