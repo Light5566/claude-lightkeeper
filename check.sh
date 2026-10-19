@@ -156,6 +156,8 @@ echo "// change" >> "$repo/app/Services/PaymentService.php"
 git -C "$tmp/vault" init -q 2>/dev/null; git -C "$tmp/vault" config user.email t@example.com; git -C "$tmp/vault" config user.name t
 git -C "$tmp/vault" add -A >/dev/null; GIT_COMMITTER_DATE="2020-01-01T00:00:00" git -C "$tmp/vault" commit -q -m "seed" --date="2020-01-01T00:00:00" >/dev/null 2>&1 || true
 expect_in "stop reminder names the note" "Affected notes: Payment" "$(hook stop_reminder cwd=$repo session_id=$sid-s)"
+echo '{"accentColor": "#123456"}' > "$tmp/vault/.obsidian/appearance.json"; git -C "$tmp/vault" commit -qam "obsidian config" >/dev/null 2>&1
+expect_in "an Obsidian-settings commit does not count as the vault moving" "Affected notes: Payment" "$(hook stop_reminder cwd=$repo session_id=$sid-s3)"
 echo "- Another gotcha." >> "$tmp/vault/2 Modules/Payment.md"
 expect_silent "stop reminder quiet when the vault is dirty" "" "$(hook stop_reminder cwd=$repo session_id=$sid-s2)"
 expect_silent "silent for an uncovered repo" "" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"

@@ -2,6 +2,11 @@
 
 All notable changes to claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.1.5 - 2026-10-19
+
+### Fixed
+- A vault commit that only touches `.obsidian/` no longer silences the Stop reminder for the next six hours. Uncommitted Obsidian settings were already ignored; committed ones now are too.
+
 ## 2.1.4 - 2026-10-19
 
 ### Fixed

@@ -86,10 +86,11 @@ def run(payload):
         return
 
     # did the vault move? (dirty or committed within the window -> assume handled)
-    # .obsidian/ is excluded: the editor rewrites its own config on every graph
-    # pan or zoom, and that must not read as "someone is editing notes".
-    dirty = git(["status", "--porcelain", "--", ".", ":(exclude).obsidian"], cwd=vault)
-    recent = git(["log", "--since", since, "--oneline", "-1"], cwd=vault)
+    # .obsidian/ is excluded from both: the editor rewrites its own config on every
+    # graph pan or zoom, and neither that nor committing it means a note changed.
+    notes = ["--", ".", ":(exclude).obsidian"]
+    dirty = git(["status", "--porcelain"] + notes, cwd=vault)
+    recent = git(["log", "--since", since, "--oneline", "-1"] + notes, cwd=vault)
     if (dirty or "").strip() or (recent or "").strip():
         return
 
