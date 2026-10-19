@@ -2,7 +2,7 @@
 
 **A knowledge map of your codebase that Claude reads before it edits and updates before it stops.**
 
-[English](README.md) · [中文](README.zh.md) · [Live demo](https://light5566.github.io/claude-vault/) (a map of BookStack, built with `/vault:seed`) · [Changelog](CHANGELOG.md)
+[English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-vault/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
 ![The pre-edit pointer and the Stop reminder firing in a Claude Code session](docs/assets/hooks.png)
 
@@ -16,7 +16,7 @@ claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown m
 
 It is the [LLM-wiki pattern](https://www.noze.it/en/insights/llm-wiki/) applied to a codebase, kept honest by hooks. Ten months of daily use across three production codebases: 464 notes, 4,500 reasoned links.
 
-![The interactive map exported from the demo vault](docs/assets/map.png)
+[![The interactive map of BookStack from the gallery](docs/assets/map.png)](https://light5566.github.io/claude-vault/maps/bookstack.html)
 
 ```
 $ vault find payment timeout

@@ -2,6 +2,14 @@
 
 All notable changes to claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.1.2 - 2026-10-19
+
+### Fixed
+- The HTML map's reader panel is wider and its tables scroll sideways instead of squeezing, so a flow's steps table shows every column.
+
+### Added
+- A gallery on the Pages site: interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack, each pinned to a commit and checked against its code.
+
 ## 2.1.1 - 2026-10-19
 
 ### Fixed

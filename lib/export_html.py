@@ -125,7 +125,7 @@ svg:active { cursor:grabbing; }
 .dim { opacity:.1; }
 .sel circle { stroke:var(--accent); stroke-width:3px; }
 #tip { position:fixed; z-index:9; max-width:380px; padding:6px 8px; font-size:12px; background:var(--panel); border:1px solid var(--line); border-radius:6px; pointer-events:none; display:none; box-shadow:0 4px 14px rgba(0,0,0,.18); }
-aside { width:420px; max-width:50vw; overflow:auto; border-left:1px solid var(--line); background:var(--panel); padding:12px 16px 24px; }
+aside { width:min(560px, 45vw); overflow:auto; border-left:1px solid var(--line); background:var(--panel); padding:12px 16px 24px; }
 aside.empty { color:var(--muted); }
 aside h2 { margin:0 0 4px; font-size:18px; }
 .meta { font-size:12px; margin-bottom:10px; }
@@ -136,7 +136,8 @@ aside h2 { margin:0 0 4px; font-size:18px; }
 .body code { background:var(--code); padding:1px 4px; border-radius:3px; font-size:12px; }
 .body pre { background:var(--code); padding:8px; border-radius:6px; overflow:auto; font-size:12px; }
 .body pre code { background:none; padding:0; }
-.body table { border-collapse:collapse; font-size:12px; margin:6px 0; max-width:100%; }
+.body table { display:block; overflow-x:auto; border-collapse:collapse; font-size:12px; margin:6px 0; max-width:100%; }
+.body td { min-width:4em; }
 .body th, .body td { border:1px solid var(--line); padding:3px 6px; text-align:left; vertical-align:top; }
 .body blockquote { margin:6px 0; padding-left:10px; border-left:3px solid var(--line); color:var(--muted); }
 .body hr { border:0; border-top:1px solid var(--line); }

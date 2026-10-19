@@ -2,7 +2,7 @@
 
 **一张代码库的知识地图：Claude 改代码前先读它，结束前必须更新它。**
 
-[English](README.md) · [中文](README.zh.md) · [在线演示](https://light5566.github.io/claude-vault/)（用 `/vault:seed` 对 BookStack 生成的地图）· [更新日志](CHANGELOG.md)
+[English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-vault/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
 ![编辑前提示与 Stop 提醒在 Claude Code 会话中触发](docs/assets/hooks.png)
 
@@ -16,7 +16,7 @@ claude-vault 是一个 Claude Code 插件。它把"系统是怎么运作的"（�
 
 这是 [LLM-wiki 模式](https://www.noze.it/en/insights/llm-wiki/)在代码库上的应用，再用 hook 强制执行。三个生产系统、十个月的日常使用：464 篇笔记，4500 条带理由的连接。
 
-![从演示 vault 导出的交互式地图](docs/assets/map.png)
+[![画廊中 BookStack 的交互式地图](docs/assets/map.png)](https://light5566.github.io/claude-vault/maps/bookstack.html)
 
 ```
 $ vault find payment timeout
