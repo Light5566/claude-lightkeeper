@@ -6,6 +6,7 @@ Pure functions over the index dict and an explicit vault root; ``main`` is the
 CLI. The page works from file:// with no server; its only external resource is
 d3 from cdnjs.
 
+    vault export --html <file.html>                      (the vault covering the cwd)
     python3 lib/export_html.py --vault <path> --out <file.html>
     python3 lib/export_html.py --vault <path> --index <index.json> --out <file.html>
 """
@@ -73,15 +74,19 @@ def _selftest():
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--vault", type=Path, help="vault root")
+    ap.add_argument("--vault", type=Path, help="vault root (default: the vault covering the cwd)")
     ap.add_argument("--index", help="read this index.json instead of loading via vaultlib")
-    ap.add_argument("--out", type=Path, help="output .html file")
+    ap.add_argument("--html", "--out", dest="out", type=Path, help="output .html file")
     ap.add_argument("--selftest", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     if args.selftest:
         return _selftest()
-    if not args.vault or not args.out:
-        ap.error("--vault and --out are required")
+    if not args.out:
+        ap.error("--html <file> is required")
+    if not args.vault:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import vaultlib
+        args.vault = vaultlib.require()
     data = collect(load_index(args.vault, args.index), args.vault)
     args.out.write_text(render(data), encoding="utf-8")
     print("%s: %d notes, %d links, %.1f MB" % (args.out, len(data["notes"]), len(data["links"]),

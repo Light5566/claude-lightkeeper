@@ -172,6 +172,8 @@ expect_in "sync defaults to this checkout's target" "== repo ==" "$out"
 # --- export + release
 out=$(CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --vault "$tmp/vault" --out "$tmp/map.html" 2>&1)
 grep -q "<html" "$tmp/map.html" 2>/dev/null && grep -q "Payment" "$tmp/map.html" && ok "vault export --html writes a page with the notes" || bad "vault export --html writes a page with the notes" "$out"
+out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --html "$tmp/map2.html" 2>&1)
+grep -q "Payment" "$tmp/map2.html" 2>/dev/null && ok "vault export --html finds the vault from the cwd" || bad "vault export --html finds the vault from the cwd" "$out"
 git -C "$repo" tag v0.1 "$(git -C "$repo" rev-list --max-parents=0 HEAD)"
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" release v0.2 --json 2>&1)
 expect_in "vault release finds the window since the previous tag" '"since": "v0.1"' "$out"

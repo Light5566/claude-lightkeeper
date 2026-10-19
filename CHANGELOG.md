@@ -2,6 +2,11 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.2.1 - 2026-10-19
+
+### Fixed
+- `vault export --html <file>` works as the README says: `--html` is accepted (`--out` still is), and the vault covering the current folder is used when `--vault` is not given.
+
 ## 2.2.0 - 2026-10-19
 
 ### Changed
