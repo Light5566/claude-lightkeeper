@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-vault/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
-![The pre-edit pointer and the Stop reminder firing in a Claude Code session](docs/assets/hooks.png)
+![A Claude Code session: the Stop reminder names the note the edit made stale, and Claude updates it](docs/assets/demo.gif)
 
 claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
 
@@ -99,6 +99,8 @@ Have an existing Obsidian vault you want to grow into this? `vault init --adopt 
 ## The hooks
 
 All advisory. None can block an edit, and all of them are silent no-ops in a repo no vault covers and on a machine without the vault.
+
+![The pre-edit pointer and the Stop reminder firing in a Claude Code session](docs/assets/hooks.png)
 
 | Event | What it says | When it stays quiet |
 |---|---|---|

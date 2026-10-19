@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-vault/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
-![编辑前提示与 Stop 提醒在 Claude Code 会话中触发](docs/assets/hooks.png)
+![一次 Claude Code 会话：Stop 提醒指出这次改动让哪篇笔记过期，Claude 随即更新它](docs/assets/demo.gif)
 
 claude-vault 是一个 Claude Code 插件。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 Claude Code 的 hook 让这张地图始终保持真实：
 
@@ -99,6 +99,8 @@ Payment  (module/shipped/full, updated 2026-10-02)
 ## Hook 一览
 
 全部只是建议。没有一个能拦截编辑；在没有 vault 覆盖的仓库里、在没有 vault 的机器上，它们全都静默。
+
+![编辑前提示与 Stop 提醒在 Claude Code 会话中触发](docs/assets/hooks.png)
 
 | 事件 | 说什么 | 什么时候不说话 |
 |---|---|---|
