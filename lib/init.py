@@ -311,7 +311,7 @@ def clone(url, path, repos):
         sys.exit("clone failed")
     cfg_path = dest / "_meta" / "vault.json"
     if not cfg_path.exists():
-        sys.exit("%s has no _meta/vault.json; it is not a claude-vault vault (use --adopt)" % dest)
+        sys.exit("%s has no _meta/vault.json; it is not a Lightkeeper vault (use --adopt)" % dest)
     if repos:
         adopt(dest, None, repos)
     print("cloned %s" % dest)

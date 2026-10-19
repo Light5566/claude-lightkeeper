@@ -1,4 +1,4 @@
-# claude-vault PR notes action
+# Lightkeeper PR notes action
 
 Comments on every pull request with the knowledge-vault notes that own the files it changed, so the question "were the notes updated?" is asked by the repo, not by whoever remembers. It works for teammates who never open Claude Code.
 
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0            # the action diffs base..head
-      - uses: Light5566/claude-vault/action@main
+      - uses: Light5566/claude-lightkeeper/action@main
         with:
           vault_repo: your-org/your-vault       # the vault's own repository
           vault_ref: main                       # optional

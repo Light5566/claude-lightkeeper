@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
+All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
+
+## 2.2.0 - 2026-10-19
+
+### Changed
+- **Renamed to Lightkeeper.** The repo is now `Light5566/claude-lightkeeper`, the marketplace is `claude-lightkeeper` and the gallery lives at `light5566.github.io/claude-lightkeeper`. The plugin itself is still called `vault`, so `/vault:…` commands, the `vault` CLI, your vaults and their git hooks are unchanged.
+- To move an existing install: `claude plugin marketplace remove claude-vault`, then `claude plugin marketplace add Light5566/claude-lightkeeper` and `claude plugin install vault@claude-lightkeeper`.
 
 ## 2.1.5 - 2026-10-19
 

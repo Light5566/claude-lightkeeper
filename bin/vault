@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""vault: the command-line door into the claude-vault plugin.
+"""vault: the command-line door into the Lightkeeper plugin.
 
     vault find <terms> | --paths <files>   topic or file lookup, with blast radius
     vault check [--write]                  lint; --write rebuilds the index and reports
@@ -62,8 +62,8 @@ def main(argv):
         sys.exit("vault: unknown command %r (try: vault --help)" % cmd)
     root = plugin_root()
     if not root:
-        sys.exit("vault: the claude-vault plugin is not installed. In Claude Code: "
-                 "/plugin marketplace add Light5566/claude-vault then /plugin install vault@claude-vault "
+        sys.exit("vault: the Lightkeeper plugin is not installed. In Claude Code: "
+                 "/plugin marketplace add Light5566/claude-lightkeeper then /plugin install vault@claude-lightkeeper "
                  "— or set CLAUDE_VAULT_PLUGIN to a checkout.")
     script = root / "lib" / CMDS[cmd]
     if not script.is_file():

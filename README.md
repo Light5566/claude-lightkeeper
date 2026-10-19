@@ -1,12 +1,12 @@
-# claude-vault
+# Lightkeeper
 
 **A knowledge map of your codebase that Claude reads before it edits and updates before it stops.**
 
-[English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-vault/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
+[English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-lightkeeper/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
 ![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo-v2.gif)
 
-claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
+Lightkeeper is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
 
 - a **session primer** that tells the agent the map exists and how to query it,
 - **prompt hints** that surface the notes relevant to what you just asked,
@@ -16,7 +16,7 @@ claude-vault is a Claude Code plugin. It keeps an Obsidian-compatible markdown m
 
 It is the [LLM-wiki pattern](https://www.noze.it/en/insights/llm-wiki/) applied to a codebase, kept honest by hooks. Ten months of daily use across three production codebases: 464 notes, 4,500 reasoned links.
 
-[![The interactive map of BookStack from the gallery](docs/assets/map.png)](https://light5566.github.io/claude-vault/maps/bookstack.html)
+[![The interactive map of BookStack from the gallery](docs/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
 
 ```
 $ vault find payment timeout
@@ -43,7 +43,7 @@ And when it tries to stop without touching the map:
 |---|---|---|
 | **claude-mem** and other memory tools | what happened in past sessions | automatic capture of transcripts |
 | **Understand-Anything** and code-graph tools | every file, function and class | regenerated from the AST |
-| **claude-vault** | how the system works and *why*: curated notes with reasons on every link, Gotchas no AST contains, decisions and client rulings | hooks make the agent read the map before editing and update it before stopping; signals say when a note is lying |
+| **Lightkeeper** | how the system works and *why*: curated notes with reasons on every link, Gotchas no AST contains, decisions and client rulings | hooks make the agent read the map before editing and update it before stopping; signals say when a note is lying |
 
 Use a memory tool *and* this. They answer different questions.
 
@@ -62,11 +62,11 @@ The cost: a map update is a separate commit in a separate repo, so git cannot co
 1. **Install the plugin** inside Claude Code:
 
    ```
-   /plugin marketplace add Light5566/claude-vault
-   /plugin install vault@claude-vault
+   /plugin marketplace add Light5566/claude-lightkeeper
+   /plugin install vault@claude-lightkeeper
    ```
 
-   or from a shell: `claude plugin marketplace add Light5566/claude-vault && claude plugin install vault@claude-vault`.
+   or from a shell: `claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install vault@claude-lightkeeper`.
 
 2. **Create a vault** for one or more checkouts. Run this in any Claude Code session:
 
@@ -176,7 +176,7 @@ The vault is its own git repo. Share it the way you share code:
 - Colleagues' pushes arrive with no hook attached, so the map drifts. `vault sync` reports everything that landed on each repo since the vault last caught up, grouped by the notes that own the changed files, and the `vault-sync` skill walks the catch-up. Advance the cursor only after the notes are updated.
 - The `post-merge` and `pre-push` git hooks that `vault init --git-hook` installs print how far the vault is behind the branch. They never block, and they work for teammates who do not use Claude.
 - `vault init --backup-remote <url>` makes every vault commit push itself, so a one-machine vault is never more than a commit behind its backup.
-- **The PR comment bot.** `uses: Light5566/claude-vault/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, and lists files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
+- **The PR comment bot.** `uses: Light5566/claude-lightkeeper/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, and lists files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
 
 ## Keeping the map honest
 

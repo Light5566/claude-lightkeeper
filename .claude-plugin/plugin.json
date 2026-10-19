@@ -1,13 +1,13 @@
 {
   "name": "vault",
-  "version": "2.1.5",
-  "description": "An Obsidian-compatible knowledge map of your codebase, kept outside the repo and kept honest by Claude Code hooks: read the map before editing, update it before stopping.",
+  "version": "2.2.0",
+  "description": "Lightkeeper: an Obsidian-compatible knowledge map of your codebase, kept outside the repo and kept honest by Claude Code hooks: read the map before editing, update it before stopping.",
   "author": {
     "name": "Light5566",
     "url": "https://github.com/Light5566"
   },
-  "homepage": "https://github.com/Light5566/claude-vault",
-  "repository": "https://github.com/Light5566/claude-vault",
+  "homepage": "https://github.com/Light5566/claude-lightkeeper",
+  "repository": "https://github.com/Light5566/claude-lightkeeper",
   "license": "MIT",
   "keywords": [
     "obsidian",

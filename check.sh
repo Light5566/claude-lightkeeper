@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Self-test for claude-vault: scaffolds a throwaway vault against a throwaway
+# Self-test for Lightkeeper: scaffolds a throwaway vault against a throwaway
 # git repo, runs every hook with synthetic payloads and checks the CLIs.
 # Needs only python3 and git. Run: bash check.sh
 set -u

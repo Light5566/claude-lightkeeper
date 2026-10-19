@@ -1,4 +1,4 @@
-name: claude-vault PR notes
+name: Lightkeeper PR notes
 description: Comments on a pull request with the knowledge-vault notes that own its changed files. Advisory only; never fails.
 author: Light5566
 branding:

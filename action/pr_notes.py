@@ -66,7 +66,7 @@ def render(vault, files, repo):
         if len(unmatched) > MAX_UNMATCHED:
             out.append("- … +%d more" % (len(unmatched) - MAX_UNMATCHED))
         out.append("")
-    out.append("_Posted by [claude-vault](https://github.com/Light5566/claude-vault). "
+    out.append("_Posted by [Lightkeeper](https://github.com/Light5566/claude-lightkeeper). "
                "Advisory only: it never blocks a merge._")
     return out
 

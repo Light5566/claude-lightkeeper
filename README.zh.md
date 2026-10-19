@@ -1,12 +1,12 @@
-# claude-vault
+# Lightkeeper
 
 **一张代码库的知识地图：Claude 改代码前先读它，结束前必须更新它。**
 
-[English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-vault/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
+[English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-lightkeeper/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
 ![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](docs/assets/demo-v2.gif)
 
-claude-vault 是一个 Claude Code 插件。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 Claude Code 的 hook 让这张地图始终保持真实：
+Lightkeeper 是一个 Claude Code 插件。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 Claude Code 的 hook 让这张地图始终保持真实：
 
 - **会话引导**：告诉 agent 地图在哪、怎么查；
 - **提示词匹配**：你刚问的问题涉及哪些笔记，立刻列出来；
@@ -16,7 +16,7 @@ claude-vault 是一个 Claude Code 插件。它把"系统是怎么运作的"（�
 
 这是 [LLM-wiki 模式](https://www.noze.it/en/insights/llm-wiki/)在代码库上的应用，再用 hook 强制执行。三个生产系统、十个月的日常使用：464 篇笔记，4500 条带理由的连接。
 
-[![画廊中 BookStack 的交互式地图](docs/assets/map.png)](https://light5566.github.io/claude-vault/maps/bookstack.html)
+[![画廊中 BookStack 的交互式地图](docs/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
 
 ```
 $ vault find payment timeout
@@ -43,7 +43,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 |---|---|---|
 | **claude-mem** 等记忆工具 | 过去的会话里发生了什么 | 自动抓取对话记录 |
 | **Understand-Anything** 等代码图谱工具 | 每一个文件、函数、类 | 从 AST 重新生成 |
-| **claude-vault** | 系统怎么运作、*为什么*这样：每条连接都带理由的精选笔记、AST 里不存在的 Gotchas、决策和客户裁定 | hook 让 agent 改之前读、结束前更新；信号告诉你哪篇笔记在说谎 |
+| **Lightkeeper** | 系统怎么运作、*为什么*这样：每条连接都带理由的精选笔记、AST 里不存在的 Gotchas、决策和客户裁定 | hook 让 agent 改之前读、结束前更新；信号告诉你哪篇笔记在说谎 |
 
 记忆工具和它**一起用**，回答的是不同的问题。
 
@@ -62,11 +62,11 @@ Payment  (module/shipped/full, updated 2026-10-02)
 1. **在 Claude Code 里安装插件：**
 
    ```
-   /plugin marketplace add Light5566/claude-vault
-   /plugin install vault@claude-vault
+   /plugin marketplace add Light5566/claude-lightkeeper
+   /plugin install vault@claude-lightkeeper
    ```
 
-   或在 shell 里：`claude plugin marketplace add Light5566/claude-vault && claude plugin install vault@claude-vault`。
+   或在 shell 里：`claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install vault@claude-lightkeeper`。
 
 2. **为一个或多个 checkout 创建 vault。** 在任意 Claude Code 会话中运行：
 
@@ -176,7 +176,7 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 - 同事推送的代码没有 hook 跟着，地图会漂移。`vault sync` 报告自上次对账以来每个仓库落地了什么，按拥有这些文件的笔记分组；`vault-sync` skill 负责补齐。只有笔记更新之后才推进游标。
 - `vault init --git-hook` 装的 `post-merge` 和 `pre-push` 钩子会打印 vault 落后分支多少。它们从不拦截，不用 Claude 的同事也能看到。
 - `vault init --backup-remote <url>` 让每次 vault 提交自动推送，单机 vault 永远只落后备份一次提交。
-- **PR 评论机器人。** 在代码仓库的 workflow 里加一行 `uses: Light5566/claude-vault/action@main`，每个 pull request 都会收到一条评论：改动的文件归哪些笔记管，以及哪些文件没有笔记认领。只提醒，不拦截。配置见 [action/README.md](action/README.md)。
+- **PR 评论机器人。** 在代码仓库的 workflow 里加一行 `uses: Light5566/claude-lightkeeper/action@main`，每个 pull request 都会收到一条评论：改动的文件归哪些笔记管，以及哪些文件没有笔记认领。只提醒，不拦截。配置见 [action/README.md](action/README.md)。
 
 ## 让地图保持诚实
 
