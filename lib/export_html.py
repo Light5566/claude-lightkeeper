@@ -235,7 +235,9 @@ const sim = d3.forceSimulation(nodes)
 sim.tick(300);                      // settle synchronously: first paint is the final layout
 draw();
 
+let moved = false;                  // the viewer zoomed or panned: stop refitting for them
 const zoom = d3.zoom().scaleExtent([0.08, 8]).on('zoom', e => {
+  if (e.sourceEvent) moved = true;
   g.attr('transform', e.transform);
   node.selectAll('text').style('display', e.transform.k < 0.55 ? 'none' : null);
 });
@@ -261,6 +263,8 @@ function centerOn(n) {
   svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(w / 2, h / 2).scale(k).translate(-n.x, -n.y));
 }
 window.addEventListener('resize', () => { if (!fitted && sim.alpha() < sim.alphaMin()) { fitted = true; fit(); } });
+// On narrow screens the reader panel sits under the graph; opening a note shrinks the graph, so refit it.
+if (window.ResizeObserver) new ResizeObserver(() => { if (!moved) fit(false); }).observe(svg.node());
 function dragStart(e, d) { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
 function dragged(e, d) { d.fx = e.x; d.fy = e.y; }
 function dragEnd(e, d) { if (!e.active) sim.alphaTarget(0); d.fx = d.fy = null; }

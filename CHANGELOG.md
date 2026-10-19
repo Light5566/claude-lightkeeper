@@ -2,6 +2,11 @@
 
 All notable changes to claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.1.3 - 2026-10-19
+
+### Fixed
+- On narrow screens the HTML map refits the graph when opening a note shrinks it, until the viewer zooms or pans themselves.
+
 ## 2.1.2 - 2026-10-19
 
 ### Fixed
