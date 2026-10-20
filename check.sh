@@ -32,6 +32,13 @@ grep -q '"remote": "github.com/acme/shop"' "$tmp/vault/_meta/vault.json" && ok "
 grep -q '"watched"' "$tmp/vault/_meta/vault.json" && ok "watched detected" || bad "watched detected" ""
 grep -q "$tmp/vault" "$CLAUDE_VAULTS_REGISTRY" && ok "registered" || bad "registered" "$(cat "$CLAUDE_VAULTS_REGISTRY")"
 
+# --- --git-hook leaves a foreign hook alone, even one that mentions claude-vault
+printf '#!/bin/sh\n# someone else: ~/claude-vault-private/gate.sh\n' > "$repo/.git/hooks/pre-push"
+out=$(python3 "$here/lib/init.py" --adopt "$tmp/vault" --name Shop --repo "$repo" --git-hook 2>&1)
+grep -q "someone else" "$repo/.git/hooks/pre-push" && ok "foreign pre-push hook kept" || bad "foreign pre-push hook kept" "$out"
+grep -q "claude-vault git hook body" "$repo/.git/hooks/post-merge" && ok "post-merge hook installed" || bad "post-merge hook installed" "$out"
+rm -f "$repo/.git/hooks/pre-push" "$repo/.git/hooks/post-merge"
+
 # --- one real module note + one stub
 cat > "$tmp/vault/2 Modules/Payment.md" <<'MD'
 ---

@@ -198,14 +198,17 @@ def install_git_hooks(checkouts):
             continue
         hooks = Path(c) / common / "hooks" if not os.path.isabs(common) else Path(common) / "hooks"
         hooks.mkdir(parents=True, exist_ok=True)
+        done = []
         for name in ("post-merge", "pre-push"):
             target = hooks / name
-            if target.exists() and "claude-vault" not in target.read_text():
+            if target.exists() and "# claude-vault git hook body" not in target.read_text():
                 print("  %s: %s exists and is not ours; left alone" % (Path(c).name, name))
                 continue
             target.write_text(body)
             target.chmod(target.stat().st_mode | stat.S_IXUSR)
-        print("  %s: post-merge + pre-push hooks installed" % Path(c).name)
+            done.append(name)
+        if done:
+            print("  %s: %s hook%s installed" % (Path(c).name, " + ".join(done), "s" * (len(done) > 1)))
 
 
 def backup_remote(vault, url):

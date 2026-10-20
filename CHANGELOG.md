@@ -2,6 +2,11 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.3.2 - 2026-10-20
+
+### Fixed
+- `vault init --git-hook` no longer overwrites a `post-merge` or `pre-push` hook it didn't write. It used to treat any hook containing the text `claude-vault` as its own, so a hook that merely mentioned that word, such as a path to another tool, was replaced. It now looks for its own header line, and the install message names only the hooks it actually wrote.
+
 ## 2.3.1 - 2026-10-20
 
 ### Fixed
