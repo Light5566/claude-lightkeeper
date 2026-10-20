@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Codebase maps gallery · Lightkeeper</title>
-<meta name="description" content="Interactive maps of 5 open-source codebases: domains, modules, end-to-end flows, and the reason behind every link. Made with Lightkeeper, a Claude Code plugin.">
-<meta property="og:title" content="5 open-source apps, mapped">
+<meta name="description" content="Interactive maps of 6 open-source codebases: domains, modules, end-to-end flows, and the reason behind every link. Made with Lightkeeper, a Claude Code plugin.">
+<meta property="og:title" content="6 open-source apps, mapped">
 <meta property="og:description" content="Domains, modules, end-to-end flows and the reason behind every link. Made with Lightkeeper, a Claude Code plugin that keeps a codebase map honest with hooks.">
 <meta property="og:image" content="https://light5566.github.io/claude-lightkeeper/assets/social.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -62,7 +62,7 @@ footer p { margin:4px 0; }
   <nav><a class="brand" href="./">Lightkeeper</a><a class="gh" href="https://github.com/Light5566/claude-lightkeeper">GitHub</a></nav>
 
   <header class="hero">
-    <h1>5 open-source apps, mapped</h1>
+    <h1>6 open-source apps, mapped</h1>
     <p>Each map is a vault of plain markdown: the business domains, the modules inside them with the files each one owns, the journeys that cross them, and a reason on every link. Click a dot to read its note. Hover a line to see why two things connect.</p>
     <p class="honest">Seeded by Claude from each app's code, the way <code>/lightkeeper:seed</code> does it, then checked by script: every file path exists at the pinned commit, and every function or class a note names was found in the code. Most modules are stubs on purpose. A team fills them in as it works.</p>
   </header>
@@ -113,6 +113,15 @@ footer p { margin:4px 0; }
         <div class="foot"><a class="src" href="https://github.com/BookStackApp/BookStack/tree/045c6a98cac21ea86906674bb91d01f375460db6" target="_blank" rel="noopener">BookStackApp/BookStack @ 045c6a9</a> <span class="lic">MIT</span><a class="open" href="maps/bookstack.html">Open map</a></div>
       </div>
     </article>
+    <article class="card">
+      <a class="thumb" href="maps/lightkeeper.html"><picture><source srcset="assets/gallery/lightkeeper-dark.png" media="(prefers-color-scheme: dark)"><img src="assets/gallery/lightkeeper.png" width="960" height="600" loading="lazy" alt="The Lightkeeper map: notes as coloured dots, links as lines"></picture></a>
+      <div class="body">
+        <div class="title"><h2><a href="maps/lightkeeper.html">Lightkeeper</a></h2><span class="chip">Python · Claude Code plugin</span></div>
+        <p>This plugin, mapped by its author: the hooks, the vault CLI and the tools that keep a team&#x27;s map true.</p>
+        <ul class="nums"><li><b>24</b> modules</li><li><b>6</b> domains</li><li><b>1</b> flow</li><li><b>130</b> reasoned links</li></ul>
+        <div class="foot"><a class="src" href="https://github.com/Light5566/claude-lightkeeper/tree/18bc45cf45998a5bc52b3a470465e6cb847cf3b1" target="_blank" rel="noopener">Light5566/claude-lightkeeper @ 18bc45c</a> <span class="lic">MIT</span><a class="open" href="maps/lightkeeper.html">Open map</a></div>
+      </div>
+    </article>
   </section>
 
   <section class="how">
@@ -131,7 +140,7 @@ footer p { margin:4px 0; }
   </section>
 
   <footer>
-    <p>Independent maps of public code, not affiliated with or endorsed by these projects. Each app's code is under its own license.</p>
+    <p>Independent maps of public code, not affiliated with or endorsed by these projects, except the Lightkeeper map, which is the author's own. Each app's code is under its own license.</p>
     <p><a href="https://github.com/Light5566/claude-lightkeeper">Lightkeeper</a> is MIT licensed.</p>
   </footer>
 </div>
