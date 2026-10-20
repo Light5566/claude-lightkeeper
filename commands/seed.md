@@ -1,7 +1,7 @@
 ---
 name: seed
 description: Propose the first domains and module stubs for a fresh vault from the repo's navigation, route groups and top-level directories. Writes nothing until the user approves the list.
-argument-hint: [repo key] [--max N]
+argument-hint: "[repo key] [--max N]"
 ---
 
 Seed the vault from the code. `$ARGUMENTS` may name one repo key from `vault.json` and a cap on the number of stubs. The default is every watched repo and 60 stubs.

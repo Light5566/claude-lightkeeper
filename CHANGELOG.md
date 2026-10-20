@@ -2,6 +2,11 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.3.1 - 2026-10-20
+
+### Fixed
+- The `/lightkeeper:seed` and `/lightkeeper:tidy` headers quote their argument hints. A hint that starts with a bracket is read by YAML as a list, which broke the seed command's header in the plugin directory's validator.
+
 ## 2.3.0 - 2026-10-20
 
 ### Changed

@@ -1,7 +1,7 @@
 ---
 name: tidy
 description: Work the vault's attention list (consolidate, re-verify, promote, path rot, link rot) or tidy one named note, with a before/after summary.
-argument-hint: [note name]
+argument-hint: "[note name]"
 ---
 
 Load the `vault-tidy` skill and follow it.
