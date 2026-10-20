@@ -1,0 +1,43 @@
+name: Bug report
+description: Something in Lightkeeper doesn't work as the README says.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Before you paste anything, remove client names, internal paths, hostnames, keys and customer data. Replacing them with `myapp` or `~/code/x` is fine.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran or asked Claude, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The error or hook message, and `vault status` run inside the checkout, if it applies.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: From `claude plugin list`.
+      placeholder: "2.3.1"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS and Python
+      placeholder: "macOS 15, Python 3.12"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed anything private from this report.
+          required: true

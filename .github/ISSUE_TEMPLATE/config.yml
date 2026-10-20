@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/Light5566/claude-lightkeeper/discussions
+    about: Ask how to do something, share your map, or suggest a feature.
