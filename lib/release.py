@@ -10,7 +10,7 @@ Prints, per target, the commits in the window, the changed files grouped by
 owning note, the files matching no note, the version-log lines added, and the
 notes whose `updated` predates the window (the sweep). If a tag or ref named
 after the version exists and is not on the production ref, says so: a release
-note describes production. Writes nothing; /vault:release drafts the note.
+note describes production. Writes nothing; /lightkeeper:release drafts the note.
 """
 import datetime
 import json

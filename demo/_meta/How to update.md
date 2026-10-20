@@ -71,7 +71,7 @@ When a version reaches the production branch:
 4. Record the commands the release needs (migrations, seeders, one-off patches) under *Commands to run*, and the flags it flips under *Flags flipped*.
 5. Flip `in-progress` claims the release made true, after verifying each one.
 
-`/vault:release vX.Y.Z` walks these steps.
+`/lightkeeper:release vX.Y.Z` walks these steps.
 
 ## Catching up
 

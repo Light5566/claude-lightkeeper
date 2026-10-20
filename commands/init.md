@@ -19,6 +19,6 @@ Show the user the output unchanged. It names the vault folder, the repos it watc
 Then tell the user, in two lines:
 
 1. Open the vault folder in Obsidian with **Open folder as vault**. `Home.md` is the entry page. `World.canvas` is the map; the tool regenerates it, so don't edit it by hand.
-2. Restart Claude Code inside the repo so the hooks pick the vault up. Then run `/vault:seed` to propose the first domains and module stubs.
+2. Restart Claude Code inside the repo so the hooks pick the vault up. Then run `/lightkeeper:seed` to propose the first domains and module stubs.
 
 If `init.py` reports an error, show it and stop. Don't create the folders by hand.

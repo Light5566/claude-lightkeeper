@@ -42,7 +42,7 @@ def plugin_root():
     plugins = data.get("plugins", data) if isinstance(data, dict) else {}
     best = None
     for key, entries in plugins.items():
-        if key.split("@")[0] != "vault":
+        if key.split("@")[0] not in ("lightkeeper", "vault"):  # renamed in 2.3.0
             continue
         for e in entries if isinstance(entries, list) else [entries]:
             p = Path(str((e or {}).get("installPath", "")))
@@ -63,7 +63,7 @@ def main(argv):
     root = plugin_root()
     if not root:
         sys.exit("vault: the Lightkeeper plugin is not installed. In Claude Code: "
-                 "/plugin marketplace add Light5566/claude-lightkeeper then /plugin install vault@claude-lightkeeper "
+                 "/plugin marketplace add Light5566/claude-lightkeeper then /plugin install lightkeeper@claude-lightkeeper "
                  "— or set CLAUDE_VAULT_PLUGIN to a checkout.")
     script = root / "lib" / CMDS[cmd]
     if not script.is_file():

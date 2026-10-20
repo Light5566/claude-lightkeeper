@@ -98,7 +98,7 @@ def main(argv):
         print("stale (> %d days): none" % stale_days)
     count = int(attention.get("count") or 0)
     if count:
-        print("attention: %d — %s  (details: _meta/Attention.md; fix with /vault:tidy)" % (
+        print("attention: %d — %s  (details: _meta/Attention.md; fix with /lightkeeper:tidy)" % (
             count, "; ".join(attention.get("top") or [])))
     elif status:
         print("attention: nothing (as of %s)" % (status.get("built_at") or "?")[:16])

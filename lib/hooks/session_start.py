@@ -29,7 +29,7 @@ def attention_line():
     st["attention_at"] = time.time()
     _util.save_vault_state(st)
     top = "; ".join((att.get("top") or [])[:3])
-    return ("%d note(s) need attention%s — run /vault:tidy when convenient "
+    return ("%d note(s) need attention%s — run /lightkeeper:tidy when convenient "
             "(details: _meta/Attention.md)." % (count, (" (%s)" % top) if top else ""))
 
 

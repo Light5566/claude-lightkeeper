@@ -8,7 +8,7 @@
   },
   "plugins": [
     {
-      "name": "vault",
+      "name": "lightkeeper",
       "description": "Obsidian-compatible codebase world map, outside the repo, kept honest by hooks: skills, hooks and a CLI.",
       "source": "./",
       "category": "productivity"

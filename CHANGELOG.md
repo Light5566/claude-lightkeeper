@@ -2,6 +2,14 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.3.0 - 2026-10-20
+
+### Changed
+- **The plugin is now called `lightkeeper`**, shown as Lightkeeper. The plugin directory asks for a distinctive name, and `vault` was a generic word that matches a well-known product. Commands are now `/lightkeeper:init`, `/lightkeeper:seed`, `/lightkeeper:tidy`, `/lightkeeper:trace` and `/lightkeeper:release`. Install with `/plugin install lightkeeper@claude-lightkeeper`.
+- **Unchanged:** the `vault` command-line tool, your vault folders and their `vault.json`, the hooks and the git hooks. The `vault` launcher now finds the plugin under either name.
+- To move an existing install: `claude plugin uninstall vault@claude-lightkeeper`, then `claude plugin marketplace update claude-lightkeeper` and `claude plugin install lightkeeper@claude-lightkeeper`. If you installed the `vault` command with `--install-cli`, run `/lightkeeper:init --install-cli` once so the launcher knows the new name.
+- The README GIF is re-encoded at 1040 px (4.6 MB), under the directory's 5 MiB file limit.
+
 ## 2.2.1 - 2026-10-19
 
 ### Fixed

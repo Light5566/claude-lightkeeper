@@ -6,7 +6,7 @@ argument-hint: [repo key] [--max N]
 
 Seed the vault from the code. `$ARGUMENTS` may name one repo key from `vault.json` and a cap on the number of stubs. The default is every watched repo and 60 stubs.
 
-1. **Resolve the vault.** Run `vault status`. It prints the vault root, the repos it watches and their checkouts. If it fails, tell the user to run `/vault:init` first and stop.
+1. **Resolve the vault.** Run `vault status`. It prints the vault root, the repos it watches and their checkouts. If it fails, tell the user to run `/lightkeeper:init` first and stop.
 2. **Read the shape of each repo.** Look at where the product groups things: the navigation menu, the route files and their groups, the top-level directories under the watched paths, the controller, service and model folders. Don't read every file. You want the clusters.
 3. **Propose domains.** One `1 Domains/` note per navigation or route group. Name them the way the product does. Don't invent a parallel taxonomy.
 4. **Propose module stubs**, at most 60, one per service, controller or model cluster that a user could point at in the UI or the API. For each, draft from `_templates/Module.md`:

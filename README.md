@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-lightkeeper/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
-![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo-v2.gif)
+![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo-v3.gif)
 
 Lightkeeper is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
 
@@ -63,15 +63,15 @@ The cost: a map update is a separate commit in a separate repo, so git cannot co
 
    ```
    /plugin marketplace add Light5566/claude-lightkeeper
-   /plugin install vault@claude-lightkeeper
+   /plugin install lightkeeper@claude-lightkeeper
    ```
 
-   or from a shell: `claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install vault@claude-lightkeeper`.
+   or from a shell: `claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install lightkeeper@claude-lightkeeper`.
 
 2. **Create a vault** for one or more checkouts. Run this in any Claude Code session:
 
    ```
-   /vault:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+   /lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
    ```
 
    This scaffolds the vault (folders, conventions, templates, Obsidian config, Bases views), writes `_meta/vault.json` describing the repos it covers, registers it in `~/.claude/vaults`, installs the `vault` command into `~/.local/bin`, and adds report-only `post-merge` and `pre-push` hooks to the checkout.
@@ -79,7 +79,7 @@ The cost: a map update is a separate commit in a separate repo, so git cannot co
 3. **Seed the first notes** from the code:
 
    ```
-   /vault:seed
+   /lightkeeper:seed
    ```
 
    Claude proposes domains and up to 60 module stubs with real file paths, asks, then writes them. From that moment the pre-edit pointer fires on the first edit.
@@ -91,7 +91,7 @@ The cost: a map update is a separate commit in a separate repo, so git cannot co
 Working on a project that already has a vault? Clone and register it in one step:
 
 ```
-/vault:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
+/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
 ```
 
 Have an existing Obsidian vault you want to grow into this? `vault init --adopt ~/my-vault --name "My App" --repo ~/code/myapp` writes the config and registers it without touching your notes; only notes that carry a `type:` are linted, so you can adopt gradually.
@@ -172,7 +172,7 @@ Environment overrides: `VAULT_ROOT` (use this vault), `VAULT_WATCHED`, `VAULT_WI
 
 The vault is its own git repo. Share it the way you share code:
 
-- Each person installs the plugin and runs `/vault:init --clone <url> --repo <checkout>`. Their hooks now point at the same map.
+- Each person installs the plugin and runs `/lightkeeper:init --clone <url> --repo <checkout>`. Their hooks now point at the same map.
 - Colleagues' pushes arrive with no hook attached, so the map drifts. `vault sync` reports everything that landed on each repo since the vault last caught up, grouped by the notes that own the changed files, and the `vault-sync` skill walks the catch-up. Advance the cursor only after the notes are updated.
 - The `post-merge` and `pre-push` git hooks that `vault init --git-hook` installs print how far the vault is behind the branch. They never block, and they work for teammates who do not use Claude.
 - `vault init --backup-remote <url>` makes every vault commit push itself, so a one-machine vault is never more than a commit behind its backup.
@@ -190,7 +190,7 @@ The vault is its own git repo. Share it the way you share code:
 | path rot | a *Where it lives* path that exists in no worktree or committed tree |
 | link rot | a link reason names a `Class::method` that no file defines |
 
-The session primer mentions the count once a day. `/vault:tidy` works the list: it regroups and dedupes Gotchas without dropping a single trap, re-reads the diff behind a stale note before confirming or fixing it, and promotes stubs from the code.
+The session primer mentions the count once a day. `/lightkeeper:tidy` works the list: it regroups and dedupes Gotchas without dropping a single trap, re-reads the diff behind a stale note before confirming or fixing it, and promotes stubs from the code.
 
 `_meta/Vault Changelog.md` is derived from the vault's git history on every `--write`, so the history of what the map learned, and when, is never hand-kept. `World.canvas` is regenerated the same way: one group per domain, modules inside, cross-domain links with their reasons.
 

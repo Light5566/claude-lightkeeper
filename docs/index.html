@@ -64,7 +64,7 @@ footer p { margin:4px 0; }
   <header class="hero">
     <h1>5 open-source apps, mapped</h1>
     <p>Each map is a vault of plain markdown: the business domains, the modules inside them with the files each one owns, the journeys that cross them, and a reason on every link. Click a dot to read its note. Hover a line to see why two things connect.</p>
-    <p class="honest">Seeded by Claude from each app's code, the way <code>/vault:seed</code> does it, then checked by script: every file path exists at the pinned commit, and every function or class a note names was found in the code. Most modules are stubs on purpose. A team fills them in as it works.</p>
+    <p class="honest">Seeded by Claude from each app's code, the way <code>/lightkeeper:seed</code> does it, then checked by script: every file path exists at the pinned commit, and every function or class a note names was found in the code. Most modules are stubs on purpose. A team fills them in as it works.</p>
   </header>
 
   <section class="grid">
@@ -125,9 +125,9 @@ footer p { margin:4px 0; }
     <h2>Map your own codebase</h2>
     <p>Inside Claude Code. Python 3.9+, no other dependencies. <a href="https://github.com/Light5566/claude-lightkeeper#install-from-zero">Full setup in the README</a>.</p>
 <pre>/plugin marketplace add Light5566/claude-lightkeeper
-/plugin install vault@claude-lightkeeper
-/vault:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
-/vault:seed</pre>
+/plugin install lightkeeper@claude-lightkeeper
+/lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+/lightkeeper:seed</pre>
   </section>
 
   <footer>

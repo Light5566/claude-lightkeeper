@@ -377,7 +377,7 @@ def main(argv):
             backup_remote(dest, opts["backup"])
         print("\nnext: open %s in Obsidian (Open folder as vault), then restart Claude Code "
               "inside a covered checkout — the session primer should appear. Seed the first "
-              "notes with /vault:seed." % dest)
+              "notes with /lightkeeper:seed." % dest)
     return 0
 
 

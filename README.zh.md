@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-lightkeeper/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
-![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](docs/assets/demo-v2.gif)
+![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](docs/assets/demo-v3.gif)
 
 Lightkeeper 是一个 Claude Code 插件。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 Claude Code 的 hook 让这张地图始终保持真实：
 
@@ -63,15 +63,15 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
    ```
    /plugin marketplace add Light5566/claude-lightkeeper
-   /plugin install vault@claude-lightkeeper
+   /plugin install lightkeeper@claude-lightkeeper
    ```
 
-   或在 shell 里：`claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install vault@claude-lightkeeper`。
+   或在 shell 里：`claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install lightkeeper@claude-lightkeeper`。
 
 2. **为一个或多个 checkout 创建 vault。** 在任意 Claude Code 会话中运行：
 
    ```
-   /vault:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+   /lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
    ```
 
    这会生成脚手架（目录、约定、模板、Obsidian 配置、Bases 视图），写入描述它覆盖哪些仓库的 `_meta/vault.json`，把它登记到 `~/.claude/vaults`，把 `vault` 命令装到 `~/.local/bin`，并给 checkout 加上只报告、不拦截的 `post-merge` 和 `pre-push` 钩子。
@@ -79,7 +79,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 3. **从代码生成第一批笔记：**
 
    ```
-   /vault:seed
+   /lightkeeper:seed
    ```
 
    Claude 提出领域划分和最多 60 个带真实文件路径的模块存根，征求你同意后写入。从这一刻起，第一次编辑就会触发编辑前指引。
@@ -91,7 +91,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 项目已经有 vault？一步克隆并登记：
 
 ```
-/vault:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
+/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
 ```
 
 已经有一个 Obsidian vault 想逐步迁入？`vault init --adopt ~/my-vault --name "My App" --repo ~/code/myapp` 只写配置并登记，不碰你的笔记；只有带 `type:` 的笔记才会被检查，可以慢慢来。
@@ -172,7 +172,7 @@ vault 里的 `_meta/vault.json`：
 
 vault 是独立的 git 仓库，像共享代码一样共享它：
 
-- 每个人安装插件并运行 `/vault:init --clone <url> --repo <checkout>`，所有人的 hook 都指向同一张地图。
+- 每个人安装插件并运行 `/lightkeeper:init --clone <url> --repo <checkout>`，所有人的 hook 都指向同一张地图。
 - 同事推送的代码没有 hook 跟着，地图会漂移。`vault sync` 报告自上次对账以来每个仓库落地了什么，按拥有这些文件的笔记分组；`vault-sync` skill 负责补齐。只有笔记更新之后才推进游标。
 - `vault init --git-hook` 装的 `post-merge` 和 `pre-push` 钩子会打印 vault 落后分支多少。它们从不拦截，不用 Claude 的同事也能看到。
 - `vault init --backup-remote <url>` 让每次 vault 提交自动推送，单机 vault 永远只落后备份一次提交。
@@ -190,7 +190,7 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 | path rot | *Where it lives* 里的路径在任何 worktree 和已提交的树里都不存在 |
 | link rot | 链接理由里提到的 `Class::method` 在代码里找不到 |
 
-会话引导每天提一次数量。`/vault:tidy` 负责处理：重组并去重 Gotchas 而不丢掉任何一个陷阱，先重读过期笔记背后的 diff 再确认或修正，从代码把存根写完整。
+会话引导每天提一次数量。`/lightkeeper:tidy` 负责处理：重组并去重 Gotchas 而不丢掉任何一个陷阱，先重读过期笔记背后的 diff 再确认或修正，从代码把存根写完整。
 
 `_meta/Vault Changelog.md` 每次 `--write` 都从 vault 自己的 git 历史生成，所以"地图什么时候学到了什么"永远不用手动维护。`World.canvas` 同样会重新生成：每个领域一个分组，模块在里面，跨领域的连接带着理由。
 
