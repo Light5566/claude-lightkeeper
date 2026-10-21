@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-lightkeeper/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
-![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo-v3.gif)
+![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
 Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 
@@ -16,7 +16,7 @@ Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It k
 
 It is the [LLM-wiki pattern](https://www.noze.it/en/insights/llm-wiki/) applied to a codebase, kept honest by hooks. Ten months of daily use across three production codebases: 464 notes, 4,500 reasoned links.
 
-[![The interactive map of BookStack from the gallery](docs/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
+[![The interactive map of BookStack from the gallery](https://light5566.github.io/claude-lightkeeper/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
 
 ```
 $ vault find payment timeout
@@ -100,7 +100,7 @@ Have an existing Obsidian vault you want to grow into this? `vault init --adopt 
 
 All advisory. None can block an edit, and all of them are silent no-ops in a repo no vault covers and on a machine without the vault.
 
-![The pre-edit pointer and the Stop reminder firing in a Claude Code session](docs/assets/hooks.png)
+![The pre-edit pointer and the Stop reminder firing in a Claude Code session](https://light5566.github.io/claude-lightkeeper/assets/hooks.png)
 
 | Event | What it says | When it stays quiet |
 |---|---|---|

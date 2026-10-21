@@ -2,6 +2,11 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.4.1 - 2026-10-21
+
+### Changed
+- The Pages site (the gallery, the README images and GIF) moved from `docs/` on `main` to the `gh-pages` branch. A plugin install no longer carries the 8 MB site, and install scanners no longer read it. The README links its images from the published site.
+
 ## 2.4.0 - 2026-10-21
 
 ### Added

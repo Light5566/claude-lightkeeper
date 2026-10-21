@@ -4,7 +4,7 @@
 
 [English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-lightkeeper/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
-![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](docs/assets/demo-v3.gif)
+![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
 Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
@@ -16,7 +16,7 @@ Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运�
 
 这是 [LLM-wiki 模式](https://www.noze.it/en/insights/llm-wiki/)在代码库上的应用，再用 hook 强制执行。三个生产系统、十个月的日常使用：464 篇笔记，4500 条带理由的连接。
 
-[![画廊中 BookStack 的交互式地图](docs/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
+[![画廊中 BookStack 的交互式地图](https://light5566.github.io/claude-lightkeeper/assets/map.png)](https://light5566.github.io/claude-lightkeeper/maps/bookstack.html)
 
 ```
 $ vault find payment timeout
@@ -100,7 +100,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
 全部只是建议。没有一个能拦截编辑；在没有 vault 覆盖的仓库里、在没有 vault 的机器上，它们全都静默。
 
-![编辑前提示与 Stop 提醒在 Claude Code 会话中触发](docs/assets/hooks.png)
+![编辑前提示与 Stop 提醒在 Claude Code 会话中触发](https://light5566.github.io/claude-lightkeeper/assets/hooks.png)
 
 | 事件 | 说什么 | 什么时候不说话 |
 |---|---|---|
