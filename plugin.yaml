@@ -1,5 +1,5 @@
 name: lightkeeper
-version: "2.4.1"
+version: "2.4.2"
 description: An Obsidian-compatible map of how your codebase works, kept outside the repo. A primer on the first turn, note pointers on prompts and edits, and a reminder when code moved but the map did not. The same hook scripts the Claude Code plugin runs.
 author: Light5566
 provides_hooks:

@@ -29,10 +29,8 @@ SKILLS = ("knowledge-vault", "vault-sync", "vault-tidy")
 COMMANDS = ("init", "seed", "tidy", "trace", "release")
 TIMEOUT = 10  # seconds per hook script, what hooks.json gives Claude Code
 
-# ponytail: module-level per-session state. One chat per process is the common case; a
-# gateway serving several chats can misattribute an edit pointer, and that is advisory text.
+# Per-session dedup, keyed by the session_id Hermes passes to every hook.
 _primed, _prompts = set(), {}
-_sid = "unknown"  # the last session seen by pre_llm_call, for hooks that pass no session_id
 
 
 def _cwd():
@@ -60,8 +58,7 @@ def _context(name, payload):
 
 
 def pre_llm_call(session_id=None, user_message="", is_first_turn=False, **kw):
-    global _sid
-    _sid = sid = session_id or "unknown"
+    sid = session_id or "unknown"
     parts = []
     if is_first_turn and sid not in _primed:  # once per session, whatever Hermes calls
         _primed.add(sid)
@@ -90,7 +87,7 @@ def transform_tool_result(tool_name=None, args=None, result=None, **kw):
         return None
     cwd = _cwd()
     path = os.path.abspath(os.path.expanduser(os.path.join(cwd, str(path))))  # join keeps an absolute path
-    pointer = _context("file_guard", {"session_id": kw.get("session_id") or _sid, "cwd": cwd,
+    pointer = _context("file_guard", {"session_id": kw.get("session_id") or "unknown", "cwd": cwd,
                                       "tool_name": tool_name, "tool_input": {"file_path": path}})
     return result + "\n\n" + pointer if pointer else None
 
@@ -98,13 +95,13 @@ def transform_tool_result(tool_name=None, args=None, result=None, **kw):
 def pre_verify(session_id=None, attempt=0, **kw):
     if attempt:
         return None  # one nudge per answer; across turns, the vault moving is the loop breaker
-    out = _hook("stop_reminder", {"session_id": session_id or _sid})
+    out = _hook("stop_reminder", {"session_id": session_id or "unknown"})
     msg = (out.get("hookSpecificOutput") or {}).get("additionalContext") or out.get("systemMessage")
     return {"action": "continue", "message": msg} if msg else None
 
 
 def on_session_finalize(session_id=None, **kw):
-    sid = session_id or _sid
+    sid = session_id or "unknown"
     msg = _hook("stop_reminder", {"session_id": sid}, VAULT_STOP_NUDGE="quiet").get("systemMessage")
     _primed.discard(sid)
     _prompts.pop(sid, None)

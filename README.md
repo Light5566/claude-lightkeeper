@@ -227,7 +227,7 @@ The registry file keeps its historical name, `~/.claude/vaults`; Claude Code is 
 |---|---|
 | Session primer | appended to your first message in a new session (`pre_llm_call`); not on a continued session, and not again after a context compaction |
 | Prompt hints | appended to the message that triggered them |
-| Pre-edit pointer | arrives with the result of `write_file` or `patch` (`transform_tool_result`), after the edit lands; Claude also acts on its PreToolUse pointer only once the tool result is in |
+| Edit pointer | after the edit, not before: it rides the result of `write_file` or `patch` (`transform_tool_result`). The agent learns which note owns the file it just changed and reads its Gotchas before going further. What names notes before any edit is the prompt hint and the primer |
 | Stop reminder | Hermes's verify gate (`pre_verify`): on a turn in which Hermes saw file edits, the reminder comes back as a synthetic user turn, once per answer, and the agent keeps working; a turn without file edits does not trigger it |
 | Notice to you | the reminder is shown once more when the session ends (`/new`, quit), never to the model |
 

@@ -2,6 +2,12 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.4.2 - 2026-10-21
+
+### Changed
+- Hermes adapter: per-session state is keyed only by the `session_id` Hermes passes to each hook. The "last session seen" fallback is gone, so a gateway serving several chats can no longer mix one chat's dedup state into another's.
+- The README's Hermes section calls the file pointer what it is there: an edit pointer that arrives after the edit, with the prompt hint and the primer as the signals that name notes before an edit.
+
 ## 2.4.1 - 2026-10-21
 
 ### Changed
