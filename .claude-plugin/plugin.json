@@ -1,7 +1,7 @@
 {
   "name": "lightkeeper",
   "displayName": "Lightkeeper",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Lightkeeper: an Obsidian-compatible knowledge map of your codebase, kept outside the repo and kept honest by Claude Code hooks: read the map before editing, update it before stopping.",
   "author": {
     "name": "Light5566",

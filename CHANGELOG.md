@@ -2,6 +2,11 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.4.3 - 2026-10-21
+
+### Fixed
+- Hermes adapter: the edit pointer now goes inside the tool's JSON result, as a `lightkeeper` field, instead of being appended as text. Appended text made the result unparsable for Hermes, which then did not record the file as edited, so its verify gate never ran and the Stop reminder only reached the user as the session-end notice. Found in a live run against Hermes 0.22.2.
+
 ## 2.4.2 - 2026-10-21
 
 ### Changed

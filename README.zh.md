@@ -227,7 +227,7 @@ python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My A
 |---|---|
 | 会话引导 | 附在新会话的第一条消息后（`pre_llm_call`）；续接的会话不触发，上下文压缩后也不会再发 |
 | 提示词提示 | 附在触发它的那条消息后 |
-| 编辑指针 | 在编辑之后，不是之前：随 `write_file` / `patch` 的结果一起送达（`transform_tool_result`）。agent 由此知道刚改的文件属于哪篇笔记，继续之前先读它的 Gotchas。在任何编辑之前就点名笔记的，是提示词提示和会话引导 |
+| 编辑指针 | 在编辑之后，不是之前：作为 `lightkeeper` 字段放在 `write_file` / `patch` 的 JSON 结果里送达（`transform_tool_result`）。agent 由此知道刚改的文件属于哪篇笔记，继续之前先读它的 Gotchas。在任何编辑之前就点名笔记的，是提示词提示和会话引导 |
 | Stop 提醒 | 走 Hermes 的 verify 门（`pre_verify`）：在 Hermes 看到文件编辑的那一轮，提醒会作为一条合成的用户消息回来，每个回答最多一次，agent 继续干活；没有文件编辑的轮次不触发 |
 | 给你的通知 | 会话结束时（`/new`、退出）再显示一次提醒，不会进入模型 |
 

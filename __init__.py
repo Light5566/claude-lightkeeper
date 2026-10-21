@@ -9,7 +9,7 @@ lib/hooks/run.py <hook>, as a subprocess with a JSON payload on stdin, and hands
 the text that comes back to Hermes:
 
   pre_llm_call           -> session primer (first turn) and prompt hints
-  transform_tool_result  -> the pre-edit pointer, appended to the result of write_file / patch
+  transform_tool_result  -> the pre-edit pointer, as a field in the JSON result of write_file / patch
   pre_verify             -> the Stop reminder, as a nudge that keeps the agent working
   on_session_finalize    -> the Stop reminder, as a notice to the user at session end
 
@@ -89,7 +89,10 @@ def transform_tool_result(tool_name=None, args=None, result=None, **kw):
     path = os.path.abspath(os.path.expanduser(os.path.join(cwd, str(path))))  # join keeps an absolute path
     pointer = _context("file_guard", {"session_id": kw.get("session_id") or "unknown", "cwd": cwd,
                                       "tool_name": tool_name, "tool_input": {"file_path": path}})
-    return result + "\n\n" + pointer if pointer else None
+    if not pointer:
+        return None
+    info["lightkeeper"] = pointer  # inside the JSON: Hermes parses this result to record the edit
+    return json.dumps(info, ensure_ascii=False)
 
 
 def pre_verify(session_id=None, attempt=0, **kw):
