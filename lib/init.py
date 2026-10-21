@@ -378,7 +378,7 @@ def main(argv):
             install_git_hooks([c for _k, _e, c, _h in repos])
         if opts["backup"]:
             backup_remote(dest, opts["backup"])
-        print("\nnext: open %s in Obsidian (Open folder as vault), then restart Claude Code "
+        print("\nnext: open %s in Obsidian (Open folder as vault), then start a new agent session "
               "inside a covered checkout — the session primer should appear. Seed the first "
               "notes with /lightkeeper:seed." % dest)
     return 0

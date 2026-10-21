@@ -6,7 +6,7 @@ tags: [meta]
 
 # How to update this vault
 
-The human-readable copy of the ritual. The machine-readable copy is the `knowledge-vault` skill the Claude Code plugin loads, and `vault-sync` is the catch-up for work that landed without a vault update. Keep this note and the skill in step. Rules specific to this vault go in `_meta/local.md`.
+The human-readable copy of the ritual. The machine-readable copy is the `knowledge-vault` skill the Lightkeeper plugin loads, and `vault-sync` is the catch-up for work that landed without a vault update. Keep this note and the skill in step. Rules specific to this vault go in `_meta/local.md`.
 
 ## Read before you write
 

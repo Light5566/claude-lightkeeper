@@ -63,6 +63,6 @@ The comment carries a hidden marker, so a later push to the same PR updates it i
 ## Testing it without a PR
 
 ```bash
-printf 'app/Services/InvoiceService.php\n' > /tmp/changed.txt
-python3 action/pr_notes.py --vault ~/vaults/myapp --files /tmp/changed.txt --repo ~/code/myapp
+printf 'app/Services/InvoiceService.php\n' > changed.txt
+python3 action/pr_notes.py --vault ~/vaults/myapp --files changed.txt --repo ~/code/myapp
 ```

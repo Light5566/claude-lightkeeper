@@ -6,7 +6,7 @@
 
 ![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](docs/assets/demo-v3.gif)
 
-Lightkeeper 是一个 Claude Code 插件。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 Claude Code 的 hook 让这张地图始终保持真实：
+Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
 - **会话引导**：告诉 agent 地图在哪、怎么查；
 - **提示词匹配**：你刚问的问题涉及哪些笔记，立刻列出来；
@@ -199,12 +199,39 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 | | |
 |---|---|
 | Claude Code（CLI、桌面端、IDE 扩展） | hook、skill、命令和 CLI |
-| 其他 agent（Cursor、Codex、Gemini CLI 等） | `vault` CLI 和 SKILL.md 文件；hook 是 Claude Code 的格式 |
+| Hermes Agent | hook、skill、流程和 CLI，通过仓库根目录的适配层；见下文 |
+| 其他 agent（Cursor、Codex、Gemini CLI 等） | `vault` CLI 和 SKILL.md 文件 |
 | macOS、Linux | 已测试 |
 | Windows | 未测试；hook 直接调用 Python，WSL 或 Git Bash 应该可以 |
 | Obsidian | 可选：图谱配色、Bases 视图和 canvas 是附加项；笔记本身是带 wikilink 的普通 Markdown，Foam、Logseq 或任何编辑器都能读 |
 | Python | 3.9 或更新，只用标准库，不需要 pip 安装任何东西 |
 | 语言和框架 | 任意；`vault init` 识别项目布局，其余交给 `vault.json` |
+
+### Hermes Agent
+
+仓库根目录同时也是一个 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 插件（`plugin.yaml`、`__init__.py`）。安装、启用，然后用同样的方式建 vault：
+
+```
+hermes plugins install Light5566/claude-lightkeeper
+hermes plugins enable lightkeeper
+python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+```
+
+注册表文件沿用历史名字 `~/.claude/vaults`，不需要装 Claude Code。你得到的东西分三层：
+
+- **CLI 兼容。** `vault` 在任何 shell 里都能用。`--install-cli` 把它放进 PATH，启动器会找到 Hermes 的安装目录。
+- **工作流集成。** 三个 skill 和五个流程都是 Hermes skill：`lightkeeper:knowledge-vault`、`lightkeeper:vault-sync`、`lightkeeper:vault-tidy`、`lightkeeper:init`、`lightkeeper:seed`、`lightkeeper:tidy`、`lightkeeper:trace`、`lightkeeper:release`。首轮引导会列出它们，agent 用 `skill_view` 加载。
+- **自动生命周期。** 适配层通过 Hermes 的插件 hook，运行与 Claude Code 完全相同的 hook 脚本。接了哪些、哪里不同：
+
+| 行为 | 在 Hermes 里 |
+|---|---|
+| 会话引导 | 附在新会话的第一条消息后（`pre_llm_call`）；续接的会话不触发，上下文压缩后也不会再发 |
+| 提示词提示 | 附在触发它的那条消息后 |
+| 改前指针 | 随 `write_file` / `patch` 的结果一起送达（`transform_tool_result`），在编辑落地之后；Claude 也是在工具结果回来后才会对 PreToolUse 的指针做出反应 |
+| Stop 提醒 | 走 Hermes 的 verify 门（`pre_verify`）：在 Hermes 看到文件编辑的那一轮，提醒会作为一条合成的用户消息回来，每个回答最多一次，agent 继续干活；没有文件编辑的轮次不触发 |
+| 给你的通知 | 会话结束时（`/new`、退出）再显示一次提醒，不会进入模型 |
+
+需要会话的工作目录是被覆盖的 checkout，并使用本地终端后端。和 Claude Code 一样，什么都不会被拦截。Lightkeeper 不是 memory provider，所以能和 Hermes 自带的记忆以及任何记忆插件并存。要求 Hermes 0.22 或更新。开发时，`bash check.sh` 用一个假的插件上下文驱动适配层；在装了 Hermes 的机器上跑 `hermes plugins validate .` 和 `hermes plugins doctor . --ci`。
 
 ## 刻意不做的事
 

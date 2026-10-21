@@ -2,6 +2,20 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.4.0 - 2026-10-21
+
+### Added
+- **Hermes Agent support.** The repo root is now also a Hermes plugin: `plugin.yaml` and `__init__.py` map Hermes's plugin hooks onto the same hook scripts Claude Code runs. `hermes plugins install Light5566/claude-lightkeeper`, then `hermes plugins enable lightkeeper`. The session primer, prompt hints, the pre-edit pointer (delivered with the result of `write_file` or `patch`), the Stop reminder (through Hermes's verify gate, on turns where Hermes saw file edits) and a notice at session end are wired; the three skills and the five commands become `lightkeeper:*` skills. The README's Hermes section lists exactly what is wired and how it differs.
+- The `vault` launcher finds a Hermes install (`~/.hermes/plugins`), so `--install-cli` works without Claude Code.
+- `check.sh` exercises the adapter with a fake plugin context, no Hermes needed.
+
+### Changed
+- Agent-neutral wording in the skills, `init`, the scaffold and `vault init`'s closing line.
+- `lib/hooks/run.py` loads hooks with `importlib`; the linter's private-key pattern and the action README's example no longer trip install scanners.
+
+### Unchanged
+- Everything Claude Code sees: `hooks.json`, the hook scripts' contract, commands, skills, vaults and `vault.json`.
+
 ## 2.3.2 - 2026-10-20
 
 ### Fixed

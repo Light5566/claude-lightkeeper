@@ -35,7 +35,7 @@ The workflow:
 
 ### The hooks
 
-Four Claude Code hook events run in every repo the vault covers. All of them advise; none blocks.
+Four hook events run in every repo the vault covers (Claude Code hooks, or the Hermes Agent adapter). All of them advise; none blocks.
 
 - **SessionStart** prints a primer: where the vault is, how to query it, and whether notes need attention.
 - **UserPromptSubmit** matches your prompt against note names, aliases and flags and names the notes to read. Once per session it also says "this sounds like a Decision" when a prompt reads like a ruling or a reversal.
@@ -215,7 +215,7 @@ When the primer or `vault status` says notes need attention, use the **vault-tid
 
 ## Vault vs agent memory
 
-Your auto-memory is private to one machine and invisible in Obsidian. **How the system works belongs in the vault**: mechanics, traps, rulings, what connects to what. Every session and every human sees it there. Memory keeps what is about working with this user: preferences, workflow, in-flight session state. When you catch yourself writing an architecture fact into memory, write the vault note instead, or as well.
+Your agent memory is private to one machine and invisible in Obsidian. **How the system works belongs in the vault**: mechanics, traps, rulings, what connects to what. Every session and every human sees it there. Memory keeps what is about working with this user: preferences, workflow, in-flight session state. When you catch yourself writing an architecture fact into memory, write the vault note instead, or as well.
 
 ---
 

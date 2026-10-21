@@ -11,8 +11,9 @@
     vault init <path> --repo <checkout>    scaffold and register a new vault
     vault init --install-cli               (re)install this launcher into ~/.local/bin
 
-Finds the installed plugin through ~/.claude/plugins/installed_plugins.json so
-the path survives plugin updates. CLAUDE_VAULT_PLUGIN overrides it (a dev
+Finds the installed plugin through ~/.claude/plugins/installed_plugins.json
+(Claude Code) or ~/.hermes/plugins (Hermes Agent) so the path survives plugin
+updates. CLAUDE_VAULT_PLUGIN overrides it (a dev
 checkout). Every subcommand accepts --vault PATH; otherwise the vault covering
 the current directory is used.
 """
@@ -38,7 +39,7 @@ def plugin_root():
     try:
         data = json.loads((Path.home() / ".claude" / "plugins" / "installed_plugins.json").read_text())
     except (OSError, ValueError):
-        return None
+        data = {}
     plugins = data.get("plugins", data) if isinstance(data, dict) else {}
     best = None
     for key, entries in plugins.items():
@@ -50,7 +51,12 @@ def plugin_root():
                 stamp = str((e or {}).get("lastUpdated") or "")
                 if best is None or stamp > best[0]:
                     best = (stamp, p)
-    return best[1] if best else None
+    if best:
+        return best[1]
+    hermes = Path(os.environ.get("HERMES_HOME") or Path.home() / ".hermes") / "plugins"
+    for p in sorted(hermes.glob("*/lib/vaultlib.py")):  # `hermes plugins install` clones the repo here
+        return p.parents[1]
+    return None
 
 
 def main(argv):
@@ -62,9 +68,10 @@ def main(argv):
         sys.exit("vault: unknown command %r (try: vault --help)" % cmd)
     root = plugin_root()
     if not root:
-        sys.exit("vault: the Lightkeeper plugin is not installed. In Claude Code: "
-                 "/plugin marketplace add Light5566/claude-lightkeeper then /plugin install lightkeeper@claude-lightkeeper "
-                 "— or set CLAUDE_VAULT_PLUGIN to a checkout.")
+        sys.exit("vault: the Lightkeeper plugin is not installed. Claude Code: /plugin marketplace add "
+                 "Light5566/claude-lightkeeper then /plugin install lightkeeper@claude-lightkeeper. "
+                 "Hermes Agent: hermes plugins install Light5566/claude-lightkeeper. "
+                 "Or set CLAUDE_VAULT_PLUGIN to a checkout.")
     script = root / "lib" / CMDS[cmd]
     if not script.is_file():
         sys.exit("vault: %r is not available in this version of the plugin (%s)" % (cmd, root))

@@ -8,7 +8,7 @@ tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 export CLAUDE_VAULTS_REGISTRY="$tmp/registry"
 export TMPDIR="$tmp"
 export VAULT_WINDOW_HOURS=6
-unset VAULT_ROOT
+unset VAULT_ROOT HERMES_HOME CLAUDE_VAULT_PLUGIN
 fail=0
 ok()   { echo "ok   $1"; }
 bad()  { echo "FAIL $1: ${2:0:160}"; fail=1; }
@@ -165,6 +165,55 @@ git -C "$tmp/vault" add -A >/dev/null; GIT_COMMITTER_DATE="2020-01-01T00:00:00" 
 expect_in "stop reminder names the note" "Affected notes: Payment" "$(hook stop_reminder cwd=$repo session_id=$sid-s)"
 echo '{"accentColor": "#123456"}' > "$tmp/vault/.obsidian/appearance.json"; git -C "$tmp/vault" commit -qam "obsidian config" >/dev/null 2>&1
 expect_in "an Obsidian-settings commit does not count as the vault moving" "Affected notes: Payment" "$(hook stop_reminder cwd=$repo session_id=$sid-s3)"
+# --- Hermes adapter: the root __init__.py driven by a fake plugin context, no Hermes installed.
+# It shares the hooks' per-session state, so the prompt test uses Payment and the edit tests use Order.
+out=$(cd "$repo" && python3 - "$here" "$repo" <<'PY'
+import importlib.util, json, os, sys
+root, repo = sys.argv[1], sys.argv[2]
+spec = importlib.util.spec_from_file_location("lk_hermes", os.path.join(root, "__init__.py"))
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+
+class Ctx:  # the slice of Hermes's PluginContext the adapter touches
+    def __init__(s): s.hooks, s.skills, s.desc = {}, {}, {}
+    def register_hook(s, name, fn): s.hooks[name] = fn
+    def register_skill(s, name, path, description=""): s.skills[name] = path; s.desc[name] = description
+ctx = Ctx(); m.register(ctx); h = ctx.hooks
+sid = "hermes-%d" % os.getpid()
+def check(name, cond): print(("ok   " if cond else "FAIL ") + "hermes: " + name)
+def llm(msg, first=False, s=sid):
+    return h["pre_llm_call"](session_id=s, user_message=msg, conversation_history=[], is_first_turn=first, model="m", platform="cli")
+def edit(tool, res, path, s=sid):
+    return h["transform_tool_result"](tool_name=tool, args={"path": path}, result=res, task_id="t1", session_id=s)
+
+r = llm("hi", first=True)
+check("first-turn primer", bool(r) and "retrieval layer" in r["context"])
+check("primer names the skills", bool(r) and "lightkeeper:knowledge-vault" in r["context"] and "lightkeeper:seed" in r["context"])
+check("primer not repeated on the next model call", llm("hi", first=True) is None)
+r = llm("please fix the payment flow timeout")
+check("prompt hint names the note", bool(r) and "Payment" in r["context"])
+check("same message, next model call: silent", llm("please fix the payment flow timeout") is None)
+r = edit("write_file", json.dumps({"success": True}), "routes/orders.php")
+check("relative path resolves against the session cwd", bool(r) and r.startswith('{"success": true}') and "still a stub" in r)
+ok_res = json.dumps({"success": True, "resolved_path": repo + "/routes/orders.php", "files_modified": [repo + "/routes/orders.php"]})
+check("patch on the same file: no second pointer", edit("patch", ok_res, "routes/orders.php") is None)
+check("error result untouched", edit("write_file", '{"error": "no such file"}', "x.php") is None)
+check("other tools untouched", h["transform_tool_result"](tool_name="terminal", args={"command": "ls"}, result="ok", task_id="t1") is None)
+r = edit("write_file", json.dumps({"success": True, "resolved_path": repo + "/app/Services/PaymentService.php"}), "ignored.php", s=sid + "-2")
+check("resolved_path wins and the session_id kwarg is used", bool(r) and "documented by vault note" in r)
+r = h["pre_verify"](session_id=sid, platform="cli", model="m", coding=True, attempt=0, final_response="done", changed_paths=["app/Services/PaymentService.php"])
+check("verify nudge names the note", bool(r) and r.get("action") == "continue" and "Affected notes: Payment" in r["message"] and "Act on this now" in r["message"])
+check("no nudge on a retry", h["pre_verify"](session_id=sid, platform="cli", model="m", coding=True, attempt=1, final_response="done", changed_paths=["x"]) is None)
+r = h["on_session_finalize"](session_id=sid, platform="cli")
+check("session-end notice", bool(r) and "Knowledge vault not updated" in r["message"])
+check("eight skills registered", set(ctx.skills) == {"knowledge-vault", "vault-sync", "vault-tidy", "init", "seed", "tidy", "trace", "release"})
+check("every skill path exists with a description", all(os.path.isfile(p) and ctx.desc[n] for n, p in ctx.skills.items()))
+gen = {c: open(ctx.skills[c]).read() for c in ("init", "seed", "tidy", "trace", "release")}
+check("generated skills carry no Claude Code placeholders", not any("$ARGUMENTS" in t or "CLAUDE_PLUGIN_ROOT" in t for t in gen.values()))
+check("generated init skill bakes the absolute plugin root", os.path.join(os.path.realpath(root), "lib", "init.py") in gen["init"])
+PY
+)
+echo "$out"; grep -q "^FAIL" <<<"$out" && fail=1
+
 echo "- Another gotcha." >> "$tmp/vault/2 Modules/Payment.md"
 expect_silent "stop reminder quiet when the vault is dirty" "" "$(hook stop_reminder cwd=$repo session_id=$sid-s2)"
 expect_silent "silent for an uncovered repo" "" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
@@ -173,6 +222,11 @@ expect_silent "garbage payload is a no-op" "" "$(printf '%s' "not json" | CLAUDE
 # --- launcher + log + sync
 out=$(CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" log --vault "$tmp/vault" Payment 2>&1)
 expect_in "vault log through the launcher" "Payment — 2 Modules/Payment.md" "$out"
+mkdir -p "$tmp/home/.hermes/plugins"; ln -s "$here" "$tmp/home/.hermes/plugins/lightkeeper"; cp "$here/bin/vault" "$tmp/vault-cli"
+out=$(HOME="$tmp/home" python3 "$tmp/vault-cli" log --vault "$tmp/vault" Payment 2>&1)
+expect_in "a copied launcher finds the plugin under ~/.hermes/plugins" "Payment — 2 Modules/Payment.md" "$out"
+v=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$here/.claude-plugin/plugin.json")
+grep -q "^version: \"$v\"$" "$here/plugin.yaml" && ok "plugin.yaml version matches plugin.json" || bad "plugin.yaml version matches plugin.json" "$v"
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" sync --no-fetch 2>&1)
 expect_in "sync defaults to this checkout's target" "== repo ==" "$out"
 

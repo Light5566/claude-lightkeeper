@@ -24,7 +24,7 @@ vault sync                                            # what landed on the produ
 vault check --write                                   # lint, rebuild the index, regenerate the generated files
 ```
 
-Every hit prints the note's one-liner, its `status` and `updated`, and its linked neighbours **with the reason each link exists**. That neighbour list is the blast radius of a change: the other notes to check before you touch this one. Inside a repo this vault covers, the Claude Code hooks surface the same notes without being asked.
+Every hit prints the note's one-liner, its `status` and `updated`, and its linked neighbours **with the reason each link exists**. That neighbour list is the blast radius of a change: the other notes to check before you touch this one. Inside a repo this vault covers, the hooks surface the same notes without being asked.
 
 ## The domains
 

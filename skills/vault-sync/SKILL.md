@@ -5,7 +5,7 @@ description: Catch the knowledge vault up with work that landed WITHOUT a vault 
 
 # Vault sync: catching up with everyone else's work
 
-The vault's write loop is hook-driven and therefore machine-local. Prompt hints, the pre-edit pointer and the Stop reminder fire only in Claude Code sessions on a machine that has the vault. Work that lands on the remote from anyone else, or from a machine without the hooks, has no ritual attached. This skill closes that gap on demand.
+The vault's write loop is hook-driven and therefore machine-local. Prompt hints, the pre-edit pointer and the Stop reminder fire only in agent sessions on a machine that has the vault. Work that lands on the remote from anyone else, or from a machine without the hooks, has no ritual attached. This skill closes that gap on demand.
 
 ## The one command
 

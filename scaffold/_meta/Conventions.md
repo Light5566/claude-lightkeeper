@@ -117,7 +117,7 @@ A stub gets promoted the first time you touch that module for real. Promotion me
 
 ## Machine index
 
-The vault is read by machines as well as people. `vault find` and the Claude Code hooks run off `_meta/index.json`, which `vault check --write` rebuilds and which is gitignored on purpose: the Stop reminder goes quiet while the vault is dirty, so a tracked, auto-rebuilt index would silence it for good.
+The vault is read by machines as well as people. `vault find` and the hooks run off `_meta/index.json`, which `vault check --write` rebuilds and which is gitignored on purpose: the Stop reminder goes quiet while the vault is dirty, so a tracked, auto-rebuilt index would silence it for good.
 
 What the index extracts, and therefore what your writing feeds:
 

@@ -7,6 +7,7 @@ named hook's run(payload). Silent no-op when no vault covers the project, when
 the vault is unusable, or on any error. Always exits 0 and never prints
 anything except the hook's own single JSON object.
 """
+import importlib
 import json
 import os
 import sys
@@ -37,7 +38,7 @@ def main():
         cwd = os.environ.get("CLAUDE_PROJECT_DIR") or payload.get("cwd") or os.getcwd()
         if not vaultlib.init(cwd=cwd):
             return
-        __import__(hook).run(payload)
+        importlib.import_module(hook).run(payload)
     except Exception:
         if os.environ.get("VAULT_HOOK_DEBUG"):
             import traceback

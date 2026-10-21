@@ -6,7 +6,7 @@
 
 ![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](docs/assets/demo-v3.gif)
 
-Lightkeeper is a Claude Code plugin. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into Claude Code so the map stays true:
+Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 
 - a **session primer** that tells the agent the map exists and how to query it,
 - **prompt hints** that surface the notes relevant to what you just asked,
@@ -199,12 +199,39 @@ The session primer mentions the count once a day. `/lightkeeper:tidy` works the 
 | | |
 |---|---|
 | Claude Code (CLI, desktop, IDE extensions) | hooks, skills, commands and the CLI |
-| Other agents (Cursor, Codex, Gemini CLI, …) | the `vault` CLI and the SKILL.md files; the hooks are Claude Code's format |
+| Hermes Agent | hooks, skills, procedures and the CLI, through the adapter at the repo root; see below |
+| Other agents (Cursor, Codex, Gemini CLI, …) | the `vault` CLI and the SKILL.md files |
 | macOS, Linux | tested |
 | Windows | untested; hooks call Python directly, so WSL or Git Bash should work |
 | Obsidian | optional: the graph colours, Bases views and canvas are extras; the notes are plain markdown with wikilinks that Foam, Logseq or any editor can read |
 | Python | 3.9 or newer, standard library only, nothing to pip install |
 | Languages and frameworks | any; `vault init` detects the layout, and `vault.json` covers the rest |
+
+### Hermes Agent
+
+The repo root is also a [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin (`plugin.yaml`, `__init__.py`). Install it, enable it, then create a vault the same way:
+
+```
+hermes plugins install Light5566/claude-lightkeeper
+hermes plugins enable lightkeeper
+python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+```
+
+The registry file keeps its historical name, `~/.claude/vaults`; Claude Code is not needed. What you get, in three tiers:
+
+- **CLI compatible.** `vault` works from any shell. `--install-cli` puts it on your PATH, and the launcher finds the Hermes install.
+- **Workflow integration.** The three skills and the five procedures are Hermes skills: `lightkeeper:knowledge-vault`, `lightkeeper:vault-sync`, `lightkeeper:vault-tidy`, `lightkeeper:init`, `lightkeeper:seed`, `lightkeeper:tidy`, `lightkeeper:trace` and `lightkeeper:release`. The first-turn primer names them, and the agent loads one with `skill_view`.
+- **Automatic lifecycle.** The adapter runs the same hook scripts Claude Code runs, through Hermes's plugin hooks. Exactly what is wired, and where it differs:
+
+| Behaviour | In Hermes |
+|---|---|
+| Session primer | appended to your first message in a new session (`pre_llm_call`); not on a continued session, and not again after a context compaction |
+| Prompt hints | appended to the message that triggered them |
+| Pre-edit pointer | arrives with the result of `write_file` or `patch` (`transform_tool_result`), after the edit lands; Claude also acts on its PreToolUse pointer only once the tool result is in |
+| Stop reminder | Hermes's verify gate (`pre_verify`): on a turn in which Hermes saw file edits, the reminder comes back as a synthetic user turn, once per answer, and the agent keeps working; a turn without file edits does not trigger it |
+| Notice to you | the reminder is shown once more when the session ends (`/new`, quit), never to the model |
+
+It needs a session whose working directory is a covered checkout, and the local terminal backend. Nothing blocks, as in Claude Code. Lightkeeper is not a memory provider, so it sits beside Hermes's own memory and any memory plugin. Hermes 0.22 or newer. For development, `bash check.sh` drives the adapter with a fake plugin context; on a machine with Hermes, run `hermes plugins validate .` and `hermes plugins doctor . --ci`.
 
 ## Not included, on purpose
 
