@@ -200,6 +200,13 @@ check("error result untouched", edit("write_file", '{"error": "no such file"}', 
 check("other tools untouched", h["transform_tool_result"](tool_name="terminal", args={"command": "ls"}, result="ok", task_id="t1") is None)
 r = edit("write_file", json.dumps({"success": True, "resolved_path": repo + "/app/Services/PaymentService.php"}), "ignored.php", s=sid + "-2")
 check("resolved_path wins and the session_id kwarg is used", bool(r) and "documented by vault note" in r)
+# What Hermes reads back (agent/tool_result_classification.py, agent/tool_dispatch_helpers.py): a write_file landed
+# when "bytes_written" is present, a patch when success is true; the edited paths are files_modified, else resolved_path.
+p = repo + "/routes/orders.php"
+for tool, res in (("write_file", {"success": True, "path": "routes/orders.php", "bytes_written": 31, "resolved_path": p, "files_modified": [p]}),
+                  ("patch", {"success": True, "diff": "@@ -1 +1 @@\n-a\n+b\n", "resolved_path": p, "files_modified": [p], "lint": {"status": "ok", "output": ""}})):
+    t = json.loads(edit(tool, json.dumps(res), "routes/orders.php", s=sid + "-" + tool) or "null")
+    check(tool + " result keeps every field Hermes reads, plus lightkeeper", isinstance(t, dict) and {k: t.get(k) for k in res} == res and set(t) == set(res) | {"lightkeeper"})
 r = h["pre_verify"](session_id=sid, platform="cli", model="m", coding=True, attempt=0, final_response="done", changed_paths=["app/Services/PaymentService.php"])
 check("verify nudge names the note", bool(r) and r.get("action") == "continue" and "Affected notes: Payment" in r["message"] and "Act on this now" in r["message"])
 check("no nudge on a retry", h["pre_verify"](session_id=sid, platform="cli", model="m", coding=True, attempt=1, final_response="done", changed_paths=["x"]) is None)
@@ -211,7 +218,7 @@ gen = {c: open(ctx.skills[c]).read() for c in ("init", "seed", "tidy", "trace", 
 check("generated skills carry no Claude Code placeholders", not any("$ARGUMENTS" in t or "CLAUDE_PLUGIN_ROOT" in t for t in gen.values()))
 check("generated init skill bakes the absolute plugin root", os.path.join(os.path.realpath(root), "lib", "init.py") in gen["init"])
 PY
-)
+) || fail=1
 echo "$out"; grep -q "^FAIL" <<<"$out" && fail=1
 
 echo "- Another gotcha." >> "$tmp/vault/2 Modules/Payment.md"

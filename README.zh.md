@@ -231,7 +231,7 @@ python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My A
 | Stop 提醒 | 走 Hermes 的 verify 门（`pre_verify`）：在 Hermes 看到文件编辑的那一轮，提醒会作为一条合成的用户消息回来，每个回答最多一次，agent 继续干活；没有文件编辑的轮次不触发 |
 | 给你的通知 | 会话结束时（`/new`、退出）再显示一次提醒，不会进入模型 |
 
-需要会话的工作目录是被覆盖的 checkout，并使用本地终端后端。和 Claude Code 一样，什么都不会被拦截。Lightkeeper 不是 memory provider，所以能和 Hermes 自带的记忆以及任何记忆插件并存。要求 Hermes 0.22 或更新。开发时，`bash check.sh` 用一个假的插件上下文驱动适配层；在装了 Hermes 的机器上跑 `hermes plugins validate .` 和 `hermes plugins doctor . --ci`。
+需要会话的工作目录是被覆盖的 checkout，并使用本地终端后端。和 Claude Code 一样，什么都不会被拦截。Lightkeeper 不是 memory provider，所以能和 Hermes 自带的记忆以及任何记忆插件并存。要求 Hermes 0.22 或更新：已在 stable 0.22.2 的 `hermes chat -q` 模式用真实模型测试；消息网关、交互式多轮、上下文压缩后的行为，以及 host-unified 的 main 构建尚未验证。开发时，`bash check.sh` 用一个假的插件上下文驱动适配层；在装了 Hermes 的机器上跑 `hermes plugins validate .` 和 `hermes plugins doctor . --ci`。
 
 ## 刻意不做的事
 

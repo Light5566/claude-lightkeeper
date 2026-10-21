@@ -9,7 +9,7 @@ lib/hooks/run.py <hook>, as a subprocess with a JSON payload on stdin, and hands
 the text that comes back to Hermes:
 
   pre_llm_call           -> session primer (first turn) and prompt hints
-  transform_tool_result  -> the pre-edit pointer, as a field in the JSON result of write_file / patch
+  transform_tool_result  -> the edit pointer, as a field in the JSON result of write_file / patch
   pre_verify             -> the Stop reminder, as a nudge that keeps the agent working
   on_session_finalize    -> the Stop reminder, as a notice to the user at session end
 

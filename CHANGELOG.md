@@ -2,6 +2,13 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.4.4 - 2026-10-21
+
+### Changed
+- README, Hermes section: states what was verified with a real model (Hermes stable 0.22.2, `hermes chat -q`) and what was not (messaging gateways, interactive multi-turn sessions, turns after a compaction, host-unified main builds).
+- `check.sh`: `write_file` and `patch` results come out of the adapter with every field Hermes reads intact (`bytes_written`, `success`, `files_modified`, `resolved_path`) and only the `lightkeeper` field added; an exception inside the adapter checks now fails the run.
+- Adapter docstring says edit pointer, as the README does.
+
 ## 2.4.3 - 2026-10-21
 
 ### Fixed
