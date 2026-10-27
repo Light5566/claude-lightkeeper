@@ -1,5 +1,7 @@
 # Lightkeeper
 
+[![Listed on ClaudePluginHub](https://www.claudepluginhub.com/badge/light5566-lightkeeper)](https://www.claudepluginhub.com/plugins/light5566-lightkeeper?ref=badge)
+
 **一张代码库的知识地图：Claude 改代码前先读它，结束前必须更新它。**
 
 [English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-lightkeeper/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)

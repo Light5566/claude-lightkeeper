@@ -1,5 +1,7 @@
 # Lightkeeper
 
+[![Listed on ClaudePluginHub](https://www.claudepluginhub.com/badge/light5566-lightkeeper)](https://www.claudepluginhub.com/plugins/light5566-lightkeeper?ref=badge)
+
 **A knowledge map of your codebase that Claude reads before it edits and updates before it stops.**
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-lightkeeper/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
