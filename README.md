@@ -8,7 +8,7 @@
 
 ![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
-Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases, the words it uses in its own way) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
+Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent and a Codex plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases, the words it uses in its own way) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 
 - a **session primer** that tells the agent the map exists and how to query it,
 - **prompt hints** that surface the notes relevant to what you just asked,
@@ -204,7 +204,8 @@ The session primer mentions the count once a day. `/lightkeeper:tidy` works the 
 |---|---|
 | Claude Code (CLI, desktop, IDE extensions) | hooks, skills, commands and the CLI |
 | Hermes Agent | hooks, skills, procedures and the CLI, through the adapter at the repo root; see below |
-| Other agents (Cursor, Codex, Gemini CLI, …) | the `vault` CLI and the SKILL.md files |
+| Codex | hooks, skills and the CLI, through the adapter in `codex/`; see below |
+| Other agents (Cursor, Gemini CLI, …) | the `vault` CLI and the SKILL.md files |
 | macOS, Linux | tested |
 | Windows | untested; hooks call Python directly, so WSL or Git Bash should work |
 | Obsidian | optional: the graph colours, Bases views and canvas are extras; the notes are plain markdown with wikilinks that Foam, Logseq or any editor can read |
@@ -236,6 +237,31 @@ The registry file keeps its historical name, `~/.claude/vaults`; Claude Code is 
 | Notice to you | the reminder is shown once more when the session ends (`/new`, quit), never to the model |
 
 It needs a session whose working directory is a covered checkout, and the local terminal backend. Nothing blocks, as in Claude Code. Lightkeeper is not a memory provider, so it sits beside Hermes's own memory and any memory plugin. Hermes 0.22 or newer: tested with a real model on stable 0.22.2 in `hermes chat -q` mode, covering `patch` and `write_file`, the edit pointer, the verify-gate reminder, the note update and the session-end notice; not yet verified are the messaging gateways, interactive multi-turn sessions, turns after a context compaction, concurrent sessions on one gateway, and host-unified main builds. For development, `bash check.sh` drives the adapter with a fake plugin context; on a machine with Hermes, run `hermes plugins validate .` and `hermes plugins doctor . --ci`.
+
+### Codex
+
+Codex installs plugins from the same marketplace, and runs Lightkeeper's hooks through a small adapter in `codex/`:
+
+```
+codex plugin marketplace add Light5566/claude-lightkeeper
+codex plugin add lightkeeper@claude-lightkeeper
+```
+
+Create a vault from a shell, or skip this if you already have one from Claude Code. `<version>` is the folder Codex made for the version it installed:
+
+```
+python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+```
+
+| Behaviour | In Codex |
+|---|---|
+| Session primer | as in Claude Code, including the short reminder after a compaction |
+| Prompt hints | as in Claude Code |
+| File pointer | before `apply_patch` lands, for every file the patch adds, updates, deletes or moves. Codex has no read tool, so there is no read pointer |
+| Stop reminder | shown to you, and once per session sent back to the agent as its next prompt: Codex's Stop hook has no context channel, so the adapter uses `decision: block` with the reminder as the reason |
+| Skills | `knowledge-vault`, `vault-sync` and `vault-tidy`. The five slash commands are Claude Code's; in Codex, use the `vault` CLI |
+
+Codex may ask you to review the plugin's hooks before they run. The adapter is tested against Codex's published hook schemas with fake payloads (`bash check.sh`); it has not yet been run in a live Codex session.
 
 ## Not included, on purpose
 

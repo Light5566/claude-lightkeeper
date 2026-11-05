@@ -2,6 +2,15 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.7.0 - 2026-11-05
+
+### Added
+- **Codex support.** Codex installs plugins from the same marketplace: `codex plugin marketplace add Light5566/claude-lightkeeper`, then `codex plugin add lightkeeper@claude-lightkeeper`. `.codex-plugin/plugin.json` points Codex at the three skills and at `codex/hooks.json`, whose hooks run `codex/adapter.py`. The adapter drives the same hook scripts through their stdin/stdout contract and translates the two places where Codex differs. The file pointer reads the files an `apply_patch` adds, updates, deletes or moves, and fires before the patch lands. The Stop reminder, which Codex's Stop hook can't carry as context, goes back to the agent once per session as `decision: block` with the reminder as its reason. The README's Codex section lists exactly what is wired.
+- The `vault` launcher finds a Codex install in `~/.codex/plugins/cache`.
+
+### Unchanged
+- Claude Code and Hermes Agent: nothing they see changed.
+
 ## 2.6.0 - 2026-11-05
 
 ### Added

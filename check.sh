@@ -253,6 +253,59 @@ PY
 ) || fail=1
 echo "$out"; grep -q "^FAIL" <<<"$out" && fail=1
 
+# --- Codex adapter: codex/adapter.py driven with Codex-shaped payloads (the schemas are in openai/codex,
+# codex-rs/hooks/schema/generated). Fresh session ids, so the shared per-session state starts empty.
+out=$(cd "$repo" && python3 - "$here" "$repo" <<'PY'
+import json, os, subprocess, sys
+root, repo = sys.argv[1], sys.argv[2]
+adapter = os.path.join(root, "codex", "adapter.py")
+sid = "codex-%d" % os.getpid()
+def check(name, cond): print(("ok   " if cond else "FAIL ") + "codex: " + name)
+def run(hook, **payload):
+    base = {"session_id": sid, "cwd": repo, "model": "m", "permission_mode": "default",
+            "transcript_path": None, "turn_id": "t1"}
+    base.update(payload)
+    r = subprocess.run([sys.executable, adapter, hook], input=json.dumps(base),
+                       capture_output=True, text=True, timeout=60)
+    return json.loads(r.stdout) if r.returncode == 0 and r.stdout.strip() else None
+def ctx(o): return ((o or {}).get("hookSpecificOutput") or {}).get("additionalContext") or ""
+
+o = run("session_start", hook_event_name="SessionStart", source="startup")
+check("primer on startup", "retrieval layer" in ctx(o) and o["hookSpecificOutput"]["hookEventName"] == "SessionStart")
+o = run("prompt_hint", hook_event_name="UserPromptSubmit", prompt="please fix the payment flow timeout", session_id=sid + "-p")
+check("prompt hint names the note", "Payment" in ctx(o))
+patch = ("*** Begin Patch\n*** Update File: app/Services/PaymentService.php\n@@\n-a\n+b\n"
+         "*** Add File: routes/orders.php\n+<?php\n*** End Patch\n")
+edit = dict(hook_event_name="PreToolUse", tool_name="apply_patch", tool_use_id="c1",
+            tool_input={"command": patch}, session_id=sid + "-e")
+o = run("file_guard", **edit)
+check("apply_patch: a pointer for every file in the patch, before it lands",
+      'vault note "Payment"' in ctx(o) and "still a stub" in ctx(o) and set(o) == {"hookSpecificOutput"}
+      and o["hookSpecificOutput"]["hookEventName"] == "PreToolUse")
+check("apply_patch: no second pointer for the same notes", run("file_guard", **edit) is None)
+check("a call without a patch is left alone",
+      run("file_guard", **dict(edit, tool_input={}, session_id=sid + "-x")) is None)
+stop = dict(hook_event_name="Stop", stop_hook_active=False, last_assistant_message="done", session_id=sid + "-s")
+o = run("stop_reminder", **stop)
+check("stop: the agent gets the reminder as its next prompt",
+      bool(o) and o.get("decision") == "block" and "Affected notes: Payment" in o.get("reason", "")
+      and "Act on this now" in o["reason"])
+check("stop: only fields Codex's Stop schema has",
+      bool(o) and set(o) <= {"systemMessage", "decision", "reason"} and "Knowledge vault not updated" in o.get("systemMessage", ""))
+o = run("stop_reminder", **stop)
+check("stop: the continuation goes once per session", bool(o) and "decision" not in o and "systemMessage" in o)
+check("stop: silent while stop_hook_active", run("stop_reminder", **dict(stop, stop_hook_active=True, session_id=sid + "-s2")) is None)
+m = json.load(open(os.path.join(root, ".codex-plugin", "plugin.json")))
+v = json.load(open(os.path.join(root, ".claude-plugin", "plugin.json")))["version"]
+check("manifest version matches plugin.json", m.get("version") == v)
+check("manifest paths start with ./ and exist", all(m[k].startswith("./") and os.path.exists(os.path.join(root, m[k])) for k in ("skills", "hooks")))
+hooks = json.load(open(os.path.join(root, m["hooks"])))["hooks"]
+cmds = [h["command"] for ev in hooks.values() for g in ev for h in g["hooks"]]
+check("every hook command runs the adapter", len(cmds) == 4 and all("codex/adapter.py" in c for c in cmds))
+PY
+) || fail=1
+echo "$out"; grep -q "^FAIL" <<<"$out" && fail=1
+
 echo "- Another gotcha." >> "$tmp/vault/2 Modules/Payment.md"
 expect_silent "stop reminder quiet when the vault is dirty" "" "$(hook stop_reminder cwd=$repo session_id=$sid-s2)"
 out=$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session=$sid 2>&1)
@@ -272,6 +325,9 @@ expect_in "vault log through the launcher" "Payment — 2 Modules/Payment.md" "$
 mkdir -p "$tmp/home/.hermes/plugins"; ln -s "$here" "$tmp/home/.hermes/plugins/lightkeeper"; cp "$here/bin/vault" "$tmp/vault-cli"
 out=$(HOME="$tmp/home" python3 "$tmp/vault-cli" log --vault "$tmp/vault" Payment 2>&1)
 expect_in "a copied launcher finds the plugin under ~/.hermes/plugins" "Payment — 2 Modules/Payment.md" "$out"
+mkdir -p "$tmp/home2" "$tmp/codexhome/plugins/cache/claude-lightkeeper/lightkeeper"; ln -s "$here" "$tmp/codexhome/plugins/cache/claude-lightkeeper/lightkeeper/9.9.9"
+out=$(HOME="$tmp/home2" CODEX_HOME="$tmp/codexhome" python3 "$tmp/vault-cli" log --vault "$tmp/vault" Payment 2>&1)
+expect_in "a copied launcher finds the plugin in Codex's plugin cache" "Payment — 2 Modules/Payment.md" "$out"
 v=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$here/.claude-plugin/plugin.json")
 grep -q "^version: \"$v\"$" "$here/plugin.yaml" && ok "plugin.yaml version matches plugin.json" || bad "plugin.yaml version matches plugin.json" "$v"
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" sync --no-fetch 2>&1)

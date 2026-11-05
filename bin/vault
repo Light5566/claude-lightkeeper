@@ -13,8 +13,8 @@
     vault init --install-cli               (re)install this launcher into ~/.local/bin
 
 Finds the installed plugin through ~/.claude/plugins/installed_plugins.json
-(Claude Code) or ~/.hermes/plugins (Hermes Agent) so the path survives plugin
-updates. CLAUDE_VAULT_PLUGIN overrides it (a dev
+(Claude Code), ~/.hermes/plugins (Hermes Agent) or ~/.codex/plugins/cache
+(Codex) so the path survives plugin updates. CLAUDE_VAULT_PLUGIN overrides it (a dev
 checkout). Every subcommand accepts --vault PATH; otherwise the vault covering
 the current directory is used.
 """
@@ -57,6 +57,10 @@ def plugin_root():
     hermes = Path(os.environ.get("HERMES_HOME") or Path.home() / ".hermes") / "plugins"
     for p in sorted(hermes.glob("*/lib/vaultlib.py")):  # `hermes plugins install` clones the repo here
         return p.parents[1]
+    codex = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "plugins" / "cache"
+    found = sorted(codex.glob("*/lightkeeper/*/lib/vaultlib.py"), key=lambda p: p.stat().st_mtime)
+    if found:  # Codex keeps one folder per installed version; the newest is in use
+        return found[-1].parents[1]
     return None
 
 
@@ -72,6 +76,8 @@ def main(argv):
         sys.exit("vault: the Lightkeeper plugin is not installed. Claude Code: /plugin marketplace add "
                  "Light5566/claude-lightkeeper then /plugin install lightkeeper@claude-lightkeeper. "
                  "Hermes Agent: hermes plugins install Light5566/claude-lightkeeper. "
+                 "Codex: codex plugin marketplace add Light5566/claude-lightkeeper then "
+                 "codex plugin add lightkeeper@claude-lightkeeper. "
                  "Or set CLAUDE_VAULT_PLUGIN to a checkout.")
     script = root / "lib" / CMDS[cmd]
     if not script.is_file():

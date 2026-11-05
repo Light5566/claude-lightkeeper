@@ -8,7 +8,7 @@
 
 ![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
-Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本，以及它自己用法特殊的词）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
+Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 和 Codex 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本，以及它自己用法特殊的词）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
 - **会话引导**：告诉 agent 地图在哪、怎么查；
 - **提示词匹配**：你刚问的问题涉及哪些笔记，立刻列出来；
@@ -204,7 +204,8 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 |---|---|
 | Claude Code（CLI、桌面端、IDE 扩展） | hook、skill、命令和 CLI |
 | Hermes Agent | hook、skill、流程和 CLI，通过仓库根目录的适配层；见下文 |
-| 其他 agent（Cursor、Codex、Gemini CLI 等） | `vault` CLI 和 SKILL.md 文件 |
+| Codex | hook、skill 和 CLI，通过 `codex/` 里的适配层；见下文 |
+| 其他 agent（Cursor、Gemini CLI 等） | `vault` CLI 和 SKILL.md 文件 |
 | macOS、Linux | 已测试 |
 | Windows | 未测试；hook 直接调用 Python，WSL 或 Git Bash 应该可以 |
 | Obsidian | 可选：图谱配色、Bases 视图和 canvas 是附加项；笔记本身是带 wikilink 的普通 Markdown，Foam、Logseq 或任何编辑器都能读 |
@@ -236,6 +237,31 @@ python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My A
 | 给你的通知 | 会话结束时（`/new`、退出）再显示一次提醒，不会进入模型 |
 
 需要会话的工作目录是被覆盖的 checkout，并使用本地终端后端。和 Claude Code 一样，什么都不会被拦截。Lightkeeper 不是 memory provider，所以能和 Hermes 自带的记忆以及任何记忆插件并存。要求 Hermes 0.22 或更新：已在 stable 0.22.2 的 `hermes chat -q` 模式用真实模型测试，覆盖 `patch` 和 `write_file`、编辑指针、verify 门提醒、笔记更新和会话结束通知；消息网关、交互式多轮、上下文压缩后的行为、同一 gateway 上的并发会话，以及 host-unified 的 main 构建尚未验证。开发时，`bash check.sh` 用一个假的插件上下文驱动适配层；在装了 Hermes 的机器上跑 `hermes plugins validate .` 和 `hermes plugins doctor . --ci`。
+
+### Codex
+
+Codex 从同一个 marketplace 安装插件，并通过 `codex/` 里的一个小适配层运行 Lightkeeper 的 hook：
+
+```
+codex plugin marketplace add Light5566/claude-lightkeeper
+codex plugin add lightkeeper@claude-lightkeeper
+```
+
+在终端里创建 vault（如果已经用 Claude Code 建过就跳过）。`<version>` 是 Codex 为所装版本建的文件夹：
+
+```
+python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+```
+
+| 行为 | 在 Codex 里 |
+|---|---|
+| 会话引导 | 和 Claude Code 一样，包括压缩上下文后的简短提醒 |
+| 提示词匹配 | 和 Claude Code 一样 |
+| 文件指引 | 在 `apply_patch` 落地之前，补丁新增、修改、删除或移动的每个文件都会提示。Codex 没有读文件的工具，所以没有读取时的提示 |
+| Stop 提醒 | 显示给你，并且每个会话一次作为下一条提示发回给 agent：Codex 的 Stop hook 没有上下文通道，适配层用 `decision: block`，把提醒作为理由 |
+| Skill | `knowledge-vault`、`vault-sync` 和 `vault-tidy`。五个斜杠命令是 Claude Code 的；在 Codex 里用 `vault` 命令行 |
+
+Codex 可能会在运行前请你审核插件的 hook。适配层用假的 payload 对照 Codex 公开的 hook schema 测过（`bash check.sh`），还没有在真实的 Codex 会话里跑过。
 
 ## 刻意不做的事
 
