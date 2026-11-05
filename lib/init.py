@@ -37,7 +37,7 @@ import vaultlib  # noqa: E402
 PLUGIN = Path(__file__).resolve().parents[1]
 SCAFFOLD = PLUGIN / "scaffold"
 FOLDERS = ["1 Domains", "2 Modules", "3 Flows", "4 Integrations", "5 Platform",
-           "6 Decisions", "7 Releases", "8 Repos"]
+           "6 Decisions", "7 Releases", "8 Repos", "9 Glossary"]
 GITIGNORE = """# Obsidian per-device UI state
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json

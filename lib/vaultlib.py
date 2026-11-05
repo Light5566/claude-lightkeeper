@@ -188,6 +188,15 @@ def count_bullets(text, heading):
     return sum(1 for l in m.group(1).splitlines() if l.lstrip().startswith("- "))
 
 
+def bullets(text, heading):
+    """The top-level `- ` bullets under `## heading`, each as one line."""
+    m = re.search(r"^## %s\s*\n(.*?)(?=^## |\Z)" % re.escape(heading), text, re.S | re.M)
+    if not m:
+        return []
+    return [" ".join(l[2:].split()) for l in m.group(1).splitlines()
+            if l.startswith("- ") and l[2:].strip()]
+
+
 def one_liner(text):
     m = re.search(r"^## What it is\s*\n+(.+?)(?=\n\s*\n|\n#|\Z)", text, re.S | re.M)
     para = m.group(1) if m else None

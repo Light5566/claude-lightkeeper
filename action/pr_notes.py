@@ -7,6 +7,7 @@ Prints markdown to stdout. Never exits non-zero: when the vault cannot be read
 the comment says so instead. Stdlib only; imports the plugin's own lib/.
 """
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -16,6 +17,37 @@ sys.path.insert(0, str(HERE.parent / "lib"))
 MARKER = "<!-- claude-vault -->"
 MAX_FILES_PER_NOTE = 8
 MAX_UNMATCHED = 20
+MAX_DETAIL_NOTES = 6
+MAX_LINKS = 3
+WIKILINK_TEXT = re.compile(r"\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]")
+
+
+def plain(text, n):
+    """Note text for a PR comment: wikilinks as plain names, and no @mentions
+    (an `@Transactional` in a Gotcha would otherwise ping a GitHub user)."""
+    import vaultlib
+    return vaultlib.trim(WIKILINK_TEXT.sub(r"\1", text).replace("@", "@​"), n)
+
+
+def details(vaultlib, idx, stems, vault):
+    """Per owning note: its reasoned links (the blast radius) and its first Gotcha."""
+    out = []
+    for stem in stems:
+        n = idx["notes"][stem]
+        sub = ["  - %s %s%s" % (d, other, (": " + plain(reason, 140)) if reason else "")
+               for d, other, reason in vaultlib.neighbors(idx, stem, MAX_LINKS)]
+        try:
+            gotchas = vaultlib.bullets((Path(vault) / n["path"]).read_text(encoding="utf-8"), "Gotchas")
+        except OSError:
+            gotchas = []
+        if gotchas:
+            more = len(gotchas) - 1
+            sub.append("  - Gotcha: %s%s" % (plain(gotchas[0], 220),
+                                            " (+%d more in the note)" % more if more else ""))
+        if sub:
+            summary = (" — " + plain(n["summary"], 160)) if n.get("summary") else ""
+            out += ["- **%s**%s" % (stem, summary)] + sub
+    return out
 
 
 def noise(path):
@@ -59,6 +91,9 @@ def render(vault, files, repo):
                 shown += " (+%d)" % (len(fs) - MAX_FILES_PER_NOTE)
             out.append("| **%s** | %s | %s |" % (stem, n.get("updated") or "?", shown))
         out.append("")
+        more = details(vaultlib, idx, sorted(by_note)[:MAX_DETAIL_NOTES], vault)
+        if more:
+            out += ["What else a change here touches, and the trap to know first:", ""] + more + [""]
     if unmatched:
         out.append("%d changed file(s) match no note (a new module, or an undocumented surface?):" % len(unmatched))
         out.append("")

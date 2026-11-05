@@ -76,6 +76,13 @@
         "a": 1,
         "rgb": 3190983
       }
+    },
+    {
+      "query": "path:\"9 Glossary\"",
+      "color": {
+        "a": 1,
+        "rgb": 10506797
+      }
     }
   ],
   "collapse-display": true,

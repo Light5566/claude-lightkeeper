@@ -8,7 +8,7 @@
 
 ![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
-Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
+Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本，以及它自己用法特殊的词）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
 - **会话引导**：告诉 agent 地图在哪、怎么查；
 - **提示词匹配**：你刚问的问题涉及哪些笔记，立刻列出来；
@@ -108,7 +108,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 |---|---|---|
 | SessionStart | vault 在哪、怎么查、更新它是完成的一部分；每天一次报告需要关注的笔记数 | resume 时 |
 | SessionStart（压缩上下文后） | 重新查 vault，别再把读过的代码读一遍；列出压缩前用到、正文已被压缩掉的笔记，并让提示和指引重新指向它们 | |
-| UserPromptSubmit | 最多三篇名字、别名或 flag 出现在你提示词里的笔记，附一句话简介和相邻笔记；每个会话一次，当提示词听起来像一个决定或裁定时提醒记录到 Decisions | 没有新匹配 |
+| UserPromptSubmit | 最多三篇名字、别名或 flag 出现在你提示词里的笔记，附一句话简介和相邻笔记；提示词里出现术语表里的词时，附上它在这里的意思；每个会话一次，当提示词听起来像一个决定或裁定时提醒记录到 Decisions | 没有新匹配 |
 | PreToolUse（Read/Write/Edit） | 即将读取或修改的文件归哪篇笔记管，以及它的邻居；读取时就提示，agent 还在规划阶段；存根笔记会说"还没记录任何内容，把你学到的写上去" | 文件无人认领，或本会话已经指过这篇笔记 |
 | Stop | 过去 6 小时里被监视的文件变了但没有笔记变动；点名拥有者笔记，并统计没有笔记认领的文件 | vault 工作区有未提交改动，或在时间窗内已提交 |
 
@@ -118,6 +118,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
 - **唯一的规则：每个 `[[链接]]` 都带一个理由。** `- [[Invoice]] — a paid order raises an invoice through InvoiceService::create()`。理由会变成每条搜索结果旁边的"影响范围"；没有理由的链接只会把图谱变成一团毛线。
 - **模块笔记里的 *Where it lives* 表格是机器读的**：真实文件，每格第一个路径写完整，绝不写容器目录。编辑前 hook 就跑在这张文件→笔记的索引上。
+- **术语表。** 这个代码库用法特殊的词，在 `9 Glossary` 里写一篇短笔记（`type: term`）：它在这里是什么意思、出现在哪里。提示词里一出现这个词，提示就会附上它的意思，agent 不用去猜。
 - **诚实字段。** `status: shipped` 表示代码在生产分支上；`depth: stub` 表示笔记还很薄；每次碰笔记都要更新 `updated:`。笔记可以是错的；代码和笔记不一致时，以代码为准，修正笔记是这次改动的一部分。
 
 脚手架里的 `_meta/Conventions.md` 和 `_meta/How to update.md` 有完整约定、触发表（什么样的改动该碰哪篇笔记）和"60 秒版本"。`knowledge-vault` skill 把这些教给 Claude。
@@ -179,7 +180,7 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 - 同事推送的代码没有 hook 跟着，地图会漂移。`vault sync` 报告自上次对账以来每个仓库落地了什么，按拥有这些文件的笔记分组；`vault-sync` skill 负责补齐。只有笔记更新之后才推进游标。
 - `vault init --git-hook` 装的 `post-merge` 和 `pre-push` 钩子会打印 vault 落后分支多少。它们从不拦截，不用 Claude 的同事也能看到。
 - `vault init --backup-remote <url>` 让每次 vault 提交自动推送，单机 vault 永远只落后备份一次提交。
-- **PR 评论机器人。** 在代码仓库的 workflow 里加一行 `uses: Light5566/claude-lightkeeper/action@main`，每个 pull request 都会收到一条评论：改动的文件归哪些笔记管，以及哪些文件没有笔记认领。只提醒，不拦截。配置见 [action/README.md](action/README.md)。
+- **PR 评论机器人。** 在代码仓库的 workflow 里加一行 `uses: Light5566/claude-lightkeeper/action@main`，每个 pull request 都会收到一条评论：改动的文件归哪些笔记管、这些笔记还连着什么以及为什么、它们的第一条 Gotcha，以及哪些文件没有笔记认领。只提醒，不拦截。配置见 [action/README.md](action/README.md)。
 
 ## 让地图保持诚实
 

@@ -8,7 +8,7 @@
 
 ![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
 
-Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
+Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases, the words it uses in its own way) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 
 - a **session primer** that tells the agent the map exists and how to query it,
 - **prompt hints** that surface the notes relevant to what you just asked,
@@ -108,7 +108,7 @@ All advisory. None can block an edit, and all of them are silent no-ops in a rep
 |---|---|---|
 | SessionStart | where the vault is, how to query it, that updating it is part of done; once a day, what needs attention | on resume |
 | SessionStart (after compaction) | re-query the vault instead of re-exploring code you already read; names the notes that were in play, whose text the compaction dropped, and lets the hints and the pointer name them again | |
-| UserPromptSubmit | up to three notes whose names, aliases or flags appear in your prompt, with their one-liners and nearest neighbours; once per session, a nudge when the prompt sounds like a decision or a ruling | nothing new matches |
+| UserPromptSubmit | up to three notes whose names, aliases or flags appear in your prompt, with their one-liners and nearest neighbours; a glossary term in your prompt comes back with its meaning; once per session, a nudge when the prompt sounds like a decision or a ruling | nothing new matches |
 | PreToolUse (Read/Write/Edit) | the note that owns the file about to be read or changed, with its neighbours; on a Read it arrives while the agent is still planning; for a stub, "nothing recorded yet, write what you learn" | the file is unowned, or you were already pointed at that note |
 | Stop | watched files changed in the last 6 hours but no note moved; names the owning notes and counts files that match no note | the vault is dirty or was committed within the window |
 
@@ -118,6 +118,7 @@ Every note is plain markdown with flat one-line frontmatter. The engine reads th
 
 - **The one rule: every `[[link]]` carries a reason.** `- [[Invoice]] — a paid order raises an invoice through InvoiceService::create()`. Reasons become the "blast radius" shown beside every search hit; a bare link makes the graph a hairball.
 - **The *Where it lives* table** of a module note is machine-read: real files, first path in a cell fully qualified, never a container directory. It is the file→note index the pre-edit hook runs on.
+- **Glossary terms.** A word this codebase uses in its own way gets a short note in `9 Glossary` (`type: term`): what it means here, and where it shows up. Whenever the word appears in a prompt, the hint gives its meaning, so the agent doesn't guess.
 - **The honesty fields.** `status: shipped` means the code is on the production branch; `depth: stub` means the note is thin; `updated:` is bumped every time you touch a note. A note can be wrong; when the code disagrees, the code wins and fixing the note is part of the change.
 
 The scaffold's `_meta/Conventions.md` and `_meta/How to update.md` hold the full conventions, the trigger table (which note to touch for which kind of change) and the sixty-second version. The `knowledge-vault` skill teaches them to Claude.
@@ -179,7 +180,7 @@ The vault is its own git repo. Share it the way you share code:
 - Colleagues' pushes arrive with no hook attached, so the map drifts. `vault sync` reports everything that landed on each repo since the vault last caught up, grouped by the notes that own the changed files, and the `vault-sync` skill walks the catch-up. Advance the cursor only after the notes are updated.
 - The `post-merge` and `pre-push` git hooks that `vault init --git-hook` installs print how far the vault is behind the branch. They never block, and they work for teammates who do not use Claude.
 - `vault init --backup-remote <url>` makes every vault commit push itself, so a one-machine vault is never more than a commit behind its backup.
-- **The PR comment bot.** `uses: Light5566/claude-lightkeeper/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, and lists files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
+- **The PR comment bot.** `uses: Light5566/claude-lightkeeper/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, what else each of those notes connects to and why, its first Gotcha, and the files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
 
 ## Keeping the map honest
 

@@ -186,7 +186,7 @@ def main(argv=None):
     # 4. frontmatter vocabulary — an off-schema value silently breaks the graph queries
     VOCAB = {
         "type": {"module", "domain", "flow", "integration", "platform",
-                 "decision", "release", "repo", "meta"},
+                 "decision", "release", "repo", "meta", "term"},
         "status": {"shipped", "in-progress", "planned", "deprecated",
                    "accepted", "open", "superseded", "superseded-in-part"},
         "depth": {"full", "stub"},
@@ -212,7 +212,7 @@ def main(argv=None):
         p.stem for p in files
         if inbound[p.stem] == 0
         and p.stem not in ORPHAN_OK
-        and meta[p].get("type") != "release"
+        and meta[p].get("type") not in ("release", "term")  # terms are reached by name, not by link
         and not str(p.relative_to(root)).startswith("_meta/")  # tooling notes, generated or local rules
     ]
     if orphans:

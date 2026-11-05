@@ -52,7 +52,7 @@ Files in this PR belong to these vault notes. Were they updated?
 - …
 ```
 
-The comment carries a hidden marker, so a later push to the same PR updates it instead of adding another. Lock files, docs and other noise are skipped, using the same list `vault sync` uses.
+Under the table of owning notes, each note shows its top reasoned links (what else a change there touches, and why) and its first Gotcha, so a reviewer sees the trap before approving. The comment carries a hidden marker, so a later push to the same PR updates it instead of adding another. Lock files, docs and other noise are skipped, using the same list `vault sync` uses.
 
 ## What it never does
 

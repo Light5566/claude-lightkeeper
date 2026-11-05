@@ -77,6 +77,7 @@ If you only do one thing from this skill, do this one.
 | **A non-obvious why**: a client ruling, a reversal, a deferred refactor | `6 Decisions/` |
 | **Renamed or removed a module** | Rename the note (Obsidian fixes inbound links) or set `status: deprecated`. **Never delete silently** |
 | **A release reached the production branch** | `7 Releases/vX.Y.Z.md` + the reconcile sweep below |
+| **A domain word got misread, or a new one appeared** | A term note in `9 Glossary/` from `_templates/Term.md`: what the word means *here*, and where it shows up. If a module already carries the name, its *What it is* is the definition instead |
 
 Nothing about the canvas. `vault check --write` regenerates `World.canvas` from the notes.
 
@@ -100,6 +101,7 @@ Nothing about the canvas. `vault check --write` regenerates `World.canvas` from 
 ├── 6 Decisions/       ← why it is this way
 ├── 7 Releases/        ← which parts of the world moved per version
 ├── 8 Repos/           ← one orientation note per codebase
+├── 9 Glossary/        ← one term note per word this codebase uses in its own way
 ├── _templates/        ← copy these
 └── _meta/             ← Conventions, How to update, vault.json, local.md (optional),
                          Coverage.md, Vault Changelog.md, Attention.md (generated), views/,
@@ -114,7 +116,7 @@ Nothing about the canvas. `vault check --write` regenerates `World.canvas` from 
 
 ```yaml
 ---
-type: module              # module|domain|flow|integration|platform|decision|release|repo|meta
+type: module              # module|domain|flow|integration|platform|decision|release|repo|term|meta
 aliases: [Billing, INV]   # optional. Other names THIS note answers to; flat ONE-LINE list
 status: shipped           # shipped|in-progress|planned|deprecated (decisions: accepted|open|superseded)
 depth: full               # full|stub

@@ -37,6 +37,7 @@ Do it in the same working session as the code, while the reasoning is still in y
 | **A non-obvious why**: a client ruling, a reversal, a deferred refactor | `6 Decisions` |
 | **Renamed or removed module** | Rename the note (Obsidian fixes inbound links) or set `status: deprecated`. Never delete silently |
 | **Release reached the production branch** | `7 Releases/vX.Y.Z.md` + the reconcile sweep below |
+| **A domain word was misread, or a new one appeared** | A `9 Glossary` term note; the prompt hint then gives its meaning whenever the word comes up |
 
 The canvas is not on the list. `vault check --write` regenerates `World.canvas` from the notes.
 

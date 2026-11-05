@@ -176,7 +176,7 @@ const COLORS = [
   ['module', '#e8832a', 'module'], ['stub', '#708090', 'stub'], ['deprecated', '#9b1c1c', 'deprecated'],
   ['domain', '#e0609a', 'domain'], ['flow', '#3aa65b', 'flow'], ['integration', '#3b7ddd', 'integration'],
   ['platform', '#8e5bd6', 'platform'], ['decision', '#d9b400', 'decision'], ['release', '#8d8d8d', 'release'],
-  ['repo', '#2a9d8f', 'repo'], ['meta', '#b5b5b5', 'other']];
+  ['repo', '#2a9d8f', 'repo'], ['term', '#a0522d', 'term'], ['meta', '#b5b5b5', 'other']];
 const COLOR = Object.fromEntries(COLORS.map(c => [c[0], c[1]]));
 const colorOf = n => n.status === 'deprecated' ? COLOR.deprecated : n.depth === 'stub' ? COLOR.stub : (COLOR[n.type] || COLOR.meta);
 

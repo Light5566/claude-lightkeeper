@@ -6,7 +6,7 @@ tags: [meta]
 
 # {{name}} — the world
 
-A living map of how {{name}} is built and how the pieces connect. Business areas live in `1 Domains`, the things you can point at in `2 Modules`, the journeys that cross them in `3 Flows`, the outside systems they call in `4 Integrations`, the conventions and traps every module inherits in `5 Platform`, the reasons things are the way they are in `6 Decisions`, what moved in each version in `7 Releases`, and one orientation note per codebase in `8 Repos`.
+A living map of how {{name}} is built and how the pieces connect. Business areas live in `1 Domains`, the things you can point at in `2 Modules`, the journeys that cross them in `3 Flows`, the outside systems they call in `4 Integrations`, the conventions and traps every module inherits in `5 Platform`, the reasons things are the way they are in `6 Decisions`, what moved in each version in `7 Releases`, one orientation note per codebase in `8 Repos`, and the words it uses in its own way in `9 Glossary`.
 
 > **[[World.canvas|World]]** — the visual map: domains as groups, modules inside them, the strongest links between them. The tool regenerates it on every `vault check --write`. Never edit it by hand.
 >
@@ -68,6 +68,7 @@ Open the graph view. Colours come from query patterns on the frontmatter, not fr
 | 🟡 Yellow | Decision |
 | ⚪ Grey | Release |
 | 🩵 Teal | Repo |
+| 🟤 Brown | Glossary term |
 
 Because the groups are queries, a note turns slate the moment its `depth` says `stub` and orange when it is written up. The graph shows coverage without anyone maintaining a list.
 

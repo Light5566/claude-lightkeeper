@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """UserPromptSubmit hook: match the prompt against note NAMES/ALIASES/FLAGS
 (tier 1 only, never content grep: precision over recall) and surface up to
-three notes the agent should read before working on those areas. A prompt
-that sounds like a decision or a ruling gets a one-line nudge, once per
-session, to record the why in 6 Decisions/.
+three notes the agent should read before working on those areas. Glossary
+notes (type: term) are listed apart, with their meaning, up to three more:
+a domain word the agent would otherwise guess at. A prompt that sounds like a
+decision or a ruling gets a one-line nudge, once per session, to record the
+why in 6 Decisions/.
 
 Each note is suggested at most once per session (state shared with the
 pre-edit file guard). Silent when nothing new matches."""
@@ -30,12 +32,20 @@ def run(payload):
     lines = []
 
     idx = _util.get_index()
-    fresh = []
+    fresh, terms = [], []
     for stem, matched_by, _score in vaultlib.match_terms(idx, prompt, tier1_only=True):
-        if stem not in seen:
-            fresh.append((stem, matched_by))
-        if len(fresh) >= MAX_NOTES:
-            break
+        if stem in seen:
+            continue
+        pick = terms if idx["notes"][stem].get("type") == "term" else fresh
+        if len(pick) < MAX_NOTES:
+            pick.append((stem, matched_by))
+    if terms:
+        lines.append("Words in your prompt that this codebase defines (vault glossary):")
+        for stem, _mb in terms:
+            note = idx["notes"][stem]
+            where = [o for d, o, _r in vaultlib.neighbors(idx, stem, MAX_NEIGHBORS + 1) if d == "→"]
+            lines.append("- %s: %s%s" % (stem, note["summary"] or "no meaning written yet (%s)" % note["path"],
+                                         " (shows up in %s)" % ", ".join(where) if where else ""))
     if fresh:
         lines.append("Knowledge-vault notes likely relevant — read before changing these "
                      "areas (vault: %s):" % vaultlib.VAULT_ROOT)
@@ -51,8 +61,9 @@ def run(payload):
                     r = (": " + vaultlib.trim(reason, 70)) if reason else ""
                     bits.append("%s %s%s" % (d, other, r))
                 lines.append("  connects %s" % "; ".join(bits))
+    if fresh or terms:
         lines.append("More: %s <terms|--paths files>" % _util.cli("find"))
-        seen.update(stem for stem, _ in fresh)
+        seen.update(stem for stem, _ in fresh + terms)
         state["seen"] = sorted(seen)
 
     if DECISION.search(prompt) and not state.get("decision_hint_sent"):

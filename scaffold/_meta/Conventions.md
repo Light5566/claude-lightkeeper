@@ -38,6 +38,7 @@ The machine index reads the reasons too. They become the "blast radius" printed 
 | `6 Decisions` | Why something is the way it is, decision-record style | Decision |
 | `7 Releases` | Which parts of the world moved in a version | Version |
 | `8 Repos` | Orientation for one codebase | Repo |
+| `9 Glossary` | Words this codebase uses in its own way, the ones a newcomer or an agent would misread | Term |
 | `_templates` | Copy these to start a note | — |
 | `_meta` | Conventions, How to update, `vault.json`, optional `local.md`, the generated files, `views/` | — |
 

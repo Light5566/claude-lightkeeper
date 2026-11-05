@@ -135,6 +135,29 @@ expect_in "vault status prints attention" "attention: 2" "$(python3 "$here/lib/s
 [ -f "$tmp/vault/_meta/Vault Changelog.md" ] && ok "Vault Changelog written" || bad "Vault Changelog written" ""
 [ -f "$tmp/vault/World.canvas" ] && python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$tmp/vault/World.canvas" && ok "World.canvas is valid JSON" || bad "World.canvas is valid JSON" ""
 
+# --- a glossary term: no orphan or schema warning, and the prompt hint gives its meaning
+[ -d "$tmp/vault/9 Glossary" ] && ok "init creates 9 Glossary" || bad "init creates 9 Glossary" "$(ls "$tmp/vault")"
+cat > "$tmp/vault/9 Glossary/Settlement.md" <<'MD'
+---
+type: term
+aliases: [settled]
+updated: 2026-01-01
+tags: [term]
+---
+
+# Settlement
+
+## What it is
+
+The moment the gateway confirms the money moved, not the moment the customer pays.
+
+## Where it shows up
+
+- [[Payment]] — an order counts as paid only after settlement
+MD
+out=$(python3 "$here/lib/check.py" --vault "$tmp/vault" 2>&1 | sed -E -n '/^(ORPHANS|OFF-SCHEMA)/,/^$/p')
+grep -q "Settlement" <<<"$out" && bad "a term note raises no orphan or schema warning" "$out" || ok "a term note raises no orphan or schema warning"
+
 # --- hooks (run.py with synthetic payloads, project = the fake checkout)
 # hook <name> key=value ...   builds the JSON payload in python (no nested shell quoting);
 # file_path=... becomes tool_input; HOOK_PROJECT overrides the project dir.
@@ -157,6 +180,9 @@ expect_in "prompt hint matches a note name" "Payment" "$(hook prompt_hint "promp
 expect_silent "same note not hinted twice" "" "$(hook prompt_hint "prompt=payment again please" cwd=$repo session_id=$sid)"
 expect_in "after a compaction the notes in play are named" "Notes in play before the compaction.*Payment" "$(hook session_start source=compact cwd=$repo session_id=$sid)"
 expect_in "after a compaction the hint names the note again" "Payment" "$(hook prompt_hint "prompt=payment again please" cwd=$repo session_id=$sid)"
+out=$(hook prompt_hint "prompt=why is this order not settled yet" cwd=$repo session_id=$sid-g)
+expect_in "prompt hint defines a glossary term" "Settlement: The moment the gateway confirms the money moved" "$out"
+expect_in "the term says where it shows up" "shows up in Payment" "$out"
 expect_in "decision nudge" "6 Decisions" "$(hook prompt_hint "prompt=the client said refunds go through support from now on" cwd=$repo session_id=$sid-d)"
 expect_in "pre-edit pointer on an owned file" "documented by vault note" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-f)"
 expect_in "stub wording on a stub's file" "still a stub" "$(hook file_guard file_path=$repo/routes/orders.php cwd=$repo session_id=$sid-f)"
@@ -269,6 +295,11 @@ out=$(python3 "$here/action/pr_notes.py" --vault "$tmp/vault" --files "$tmp/chan
 expect_in "pr_notes starts with the marker" "^<!-- claude-vault -->" "$out"
 expect_in "pr_notes names the owning note" "\*\*Payment\*\*" "$out"
 expect_in "pr_notes lists the unmatched file" "NewThing.php" "$out"
+expect_in "pr_notes gives the reasoned links" "→ Order: a paid order moves to fulfilment" "$out"
+expect_in "pr_notes gives the first Gotcha" "Gotcha: The gateway times out after 30 s." "$out"
+python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import pr_notes
+out = pr_notes.plain("wrap it in @Transactional, see [[Order|the order]]", 200)
+print("ok   pr_notes defuses @mentions and wikilinks" if "@Transactional" not in out and "Transactional" in out and "[[" not in out else "FAIL pr_notes defuses @mentions and wikilinks: " + out)' "$here/action" | tee /dev/stderr | grep -q "^ok" || fail=1
 grep -q "composer.lock" <<<"$out" && bad "pr_notes skips noise files" "$out" || ok "pr_notes skips noise files"
 out=$(python3 "$here/action/pr_notes.py" --vault "$tmp/nowhere" --files "$tmp/changed.txt" --repo "$repo" 2>&1); rc=$?
 [ $rc -eq 0 ] && expect_in "pr_notes never fails without a vault" "Could not read the vault" "$out" || bad "pr_notes never fails without a vault" "$out"

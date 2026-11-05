@@ -2,6 +2,12 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.6.0 - 2026-11-05
+
+### Added
+- **Glossary notes.** A word the codebase uses in its own way gets a short note in `9 Glossary` with `type: term`: what it means here and where it shows up (new template `_templates/Term.md`). When the word, or one of its aliases, appears in a prompt, the prompt hint lists it apart from the module notes, with its meaning, up to three terms. `vault check` accepts the type and doesn't call a term an orphan, because terms are reached by name, not by link. New vaults get the folder, a brown graph colour and a legend row; in an existing vault, create `9 Glossary/` and copy the template.
+- **The PR comment says what else a change touches.** Under the table, each owning note now shows its top reasoned links, which are the blast radius, and its first Gotcha. Wikilinks render as plain names, and an `@` in a note can't mention a GitHub user.
+
 ## 2.5.0 - 2026-11-05
 
 ### Added
