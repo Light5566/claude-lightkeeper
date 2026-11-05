@@ -338,6 +338,19 @@ out=$(CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --vault "$tmp
 grep -q "<html" "$tmp/map.html" 2>/dev/null && grep -q "Payment" "$tmp/map.html" && ok "vault export --html writes a page with the notes" || bad "vault export --html writes a page with the notes" "$out"
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --html "$tmp/map2.html" 2>&1)
 grep -q "Payment" "$tmp/map2.html" 2>/dev/null && ok "vault export --html finds the vault from the cwd" || bad "vault export --html finds the vault from the cwd" "$out"
+before=$(git -C "$repo" status --porcelain)
+out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --agents-md 2>&1)
+expect_in "export --agents-md prints the block between markers" "lightkeeper:end" "$out"
+expect_in "export --agents-md names the vault" "the Shop vault" "$out"
+expect_in "export --agents-md maps a note to its code" 'Payment.md` | Takes the money for an order. | `app/Services/PaymentService.php`' "$out"
+expect_in "export --agents-md marks a stub" 'Order.md` (stub)' "$out"
+grep -q "Settlement" <<<"$out" && bad "export --agents-md lists only notes that own code" "$out" || ok "export --agents-md lists only notes that own code"
+[ ! -e "$repo/AGENTS.md" ] && [ "$(git -C "$repo" status --porcelain)" = "$before" ] && ok "export --agents-md writes nothing" || bad "export --agents-md writes nothing" "$(git -C "$repo" status --porcelain)"
+git -C "$tmp/vault" remote add origin https://someone:s3cret@example.com/acme/shop-vault.git
+out=$(CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" export --agents-md --vault "$tmp/vault" 2>&1)
+expect_in "export --agents-md gives the vault's remote" 'cloned from `https://example.com/acme/shop-vault.git`' "$out"
+grep -q "s3cret" <<<"$out" && bad "export --agents-md drops credentials from the remote" "$out" || ok "export --agents-md drops credentials from the remote"
+git -C "$tmp/vault" remote remove origin
 git -C "$repo" tag v0.1 "$(git -C "$repo" rev-list --max-parents=0 HEAD)"
 out=$(cd "$repo" && CLAUDE_VAULT_PLUGIN="$here" python3 "$here/bin/vault" release v0.2 --json 2>&1)
 expect_in "vault release finds the window since the previous tag" '"since": "v0.1"' "$out"

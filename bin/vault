@@ -9,6 +9,7 @@
     vault log <note>                       that note's git history
     vault release vX.Y.Z [--since REF]     draft data for a release note
     vault export --html FILE               self-contained interactive map
+    vault export --agents-md               a block for AGENTS.md, printed, never written
     vault init <path> --repo <checkout>    scaffold and register a new vault
     vault init --install-cli               (re)install this launcher into ~/.local/bin
 

@@ -2,6 +2,14 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.8.0 - 2026-11-05
+
+### Added
+- **`vault export --agents-md`.** Prints a short block for `AGENTS.md`, `CLAUDE.md` or `GEMINI.md`, so agents that don't run Lightkeeper's hooks still find the map. The block says where the vault is: its path and, when it has one, its git remote with any credentials removed, plus the command to clone it. It says how to search the vault, and that updating the owning note is part of the definition of done. Then it lists, at most 15 rows, the module and integration notes that own code in this repo, with their files, full notes first. The command only prints: nothing is written for you, and no hook runs it. To refresh, run it again and replace the text between the markers. `--repo KEY` picks the repo when one vault covers several.
+
+### Changed
+- README: the Codex section says what the live runs covered, and that a Codex agent reads the file pointer together with the patch's result.
+
 ## 2.7.0 - 2026-11-05
 
 ### Added

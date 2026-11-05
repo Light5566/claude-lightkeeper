@@ -9,6 +9,10 @@ d3 from cdnjs.
     vault export --html <file.html>                      (the vault covering the cwd)
     python3 lib/export_html.py --vault <path> --out <file.html>
     python3 lib/export_html.py --vault <path> --index <index.json> --out <file.html>
+
+`vault export --agents-md [--repo KEY]` prints a block for AGENTS.md instead
+(agents_md.py). It lives behind this file because every copy of the `vault`
+launcher, old ones included, sends `export` here.
 """
 import argparse
 import json
@@ -77,10 +81,17 @@ def main(argv=None):
     ap.add_argument("--vault", type=Path, help="vault root (default: the vault covering the cwd)")
     ap.add_argument("--index", help="read this index.json instead of loading via vaultlib")
     ap.add_argument("--html", "--out", dest="out", type=Path, help="output .html file")
+    ap.add_argument("--agents-md", action="store_true",
+                    help="print a block for AGENTS.md instead (writes nothing)")
+    ap.add_argument("--repo", help="with --agents-md: the vault.json repo key, when the vault covers several")
     ap.add_argument("--selftest", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     if args.selftest:
         return _selftest()
+    if args.agents_md:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import agents_md
+        return agents_md.main(args.vault, args.repo)
     if not args.out:
         ap.error("--html <file> is required")
     if not args.vault:

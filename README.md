@@ -135,10 +135,13 @@ vault status --session          what the hooks did in the latest session: runs, 
 vault sync [target] [--advance] what landed on the repos since the vault last caught up
 vault log <note>                that note's git history
 vault export --html <file>      a self-contained interactive map
+vault export --agents-md        a block for AGENTS.md: where the map is, how to search it, which note owns which code
 vault init ...                  scaffold, clone or adopt a vault
 ```
 
 Every command takes `--vault <path>`; without it, the vault covering the current directory is used.
+
+`vault export --agents-md` is for agents that don't run Lightkeeper's hooks. It prints the block and never writes it anywhere: paste it into `AGENTS.md`, `CLAUDE.md` or `GEMINI.md`, or ask your agent to, so you see the diff. To refresh it, run the command again and replace what sits between the two markers. When one vault covers several repos, run it from the checkout, or pass `--repo KEY`.
 
 `vault check` catches unresolved links, duplicate note names, bare links, container-directory claims, off-schema frontmatter, orphans, stale notes, and anything that looks like a secret or personal data (email addresses, long digit runs, API-key shapes, private keys). Run it with `--write` before every vault commit.
 
@@ -205,7 +208,7 @@ The session primer mentions the count once a day. `/lightkeeper:tidy` works the 
 | Claude Code (CLI, desktop, IDE extensions) | hooks, skills, commands and the CLI |
 | Hermes Agent | hooks, skills, procedures and the CLI, through the adapter at the repo root; see below |
 | Codex | hooks, skills and the CLI, through the adapter in `codex/`; see below |
-| Other agents (Cursor, Gemini CLI, …) | the `vault` CLI and the SKILL.md files |
+| Other agents (Cursor, Gemini CLI, …) | the `vault` CLI, the SKILL.md files, and a block for their AGENTS.md from `vault export --agents-md` |
 | macOS, Linux | tested |
 | Windows | untested; hooks call Python directly, so WSL or Git Bash should work |
 | Obsidian | optional: the graph colours, Bases views and canvas are extras; the notes are plain markdown with wikilinks that Foam, Logseq or any editor can read |

@@ -135,10 +135,13 @@ vault status --session          最近一个会话里 hook 做了什么：运行
 vault sync [target] [--advance] 自上次对账以来仓库里落地了什么
 vault log <note>                这篇笔记的 git 历史
 vault export --html <file>      一个自包含的交互式地图
+vault export --agents-md        给 AGENTS.md 的一段说明：地图在哪、怎么查、哪篇笔记管哪些代码
 vault init ...                  创建、克隆或接管一个 vault
 ```
 
 每个命令都接受 `--vault <path>`；不给的话，用覆盖当前目录的那个 vault。
+
+`vault export --agents-md` 是给不跑 Lightkeeper hook 的 agent 用的。它只打印这段说明，从不写进任何文件：你自己把它贴进 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`，或者让 agent 去贴，这样你能看到 diff。要刷新，就再跑一次，替换两个标记之间的内容。一个 vault 覆盖多个仓库时，在对应的 checkout 里跑，或者传 `--repo KEY`。
 
 `vault check` 会抓出解析不了的链接、重名笔记、没有理由的链接、容器目录声明、不合规的 frontmatter、孤儿笔记、过期笔记，以及任何像密钥或个人数据的东西（邮箱、长数字串、API key 形状、私钥）。每次提交 vault 前都带 `--write` 跑一次。
 
@@ -205,7 +208,7 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 | Claude Code（CLI、桌面端、IDE 扩展） | hook、skill、命令和 CLI |
 | Hermes Agent | hook、skill、流程和 CLI，通过仓库根目录的适配层；见下文 |
 | Codex | hook、skill 和 CLI，通过 `codex/` 里的适配层；见下文 |
-| 其他 agent（Cursor、Gemini CLI 等） | `vault` CLI 和 SKILL.md 文件 |
+| 其他 agent（Cursor、Gemini CLI 等） | `vault` CLI、SKILL.md 文件，以及 `vault export --agents-md` 打印的、给它们的 AGENTS.md 用的一段说明 |
 | macOS、Linux | 已测试 |
 | Windows | 未测试；hook 直接调用 Python，WSL 或 Git Bash 应该可以 |
 | Obsidian | 可选：图谱配色、Bases 视图和 canvas 是附加项；笔记本身是带 wikilink 的普通 Markdown，Foam、Logseq 或任何编辑器都能读 |
