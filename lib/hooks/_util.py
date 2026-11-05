@@ -82,6 +82,11 @@ def save_vault_state(state):
     save_state("vault", state)
 
 
+def is_read(payload):
+    """A read rather than an edit, by tool name (Read in Claude Code)."""
+    return "read" in str(payload.get("tool_name") or "").lower()
+
+
 def emit_context(event, text):
     print(json.dumps({
         "hookSpecificOutput": {"hookEventName": event, "additionalContext": text}

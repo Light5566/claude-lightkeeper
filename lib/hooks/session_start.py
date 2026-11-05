@@ -2,7 +2,9 @@
 """SessionStart hook: a short static primer telling the agent the vault exists
 and how to query it. No index load: this must be near-instant. Silent on
 resume (the primer is already in the transcript); after a compaction
-(source "compact") it sends a one-line reminder instead of the full primer.
+(source "compact") it sends a short reminder instead of the full primer, names
+the notes surfaced before the compaction and re-arms the prompt hints and the
+file pointer for them: their text left the context with the summary.
 Once per 24h it also surfaces the maintenance signals from _meta/status.json."""
 import json
 import time
@@ -12,6 +14,19 @@ import _util
 import vaultlib
 
 ATTENTION_EVERY = 24 * 3600
+MAX_IN_PLAY = 8
+
+
+def rearm(session):
+    """Clear the session's `seen` set so the hints and the pointer name those notes
+    again; keep them in `earlier` for `vault status --session`. Returns them."""
+    state = _util.load_state(session)
+    seen = state.get("seen") or []
+    if seen:
+        state["earlier"] = sorted(set(state.get("earlier") or []) | set(seen))
+        state["seen"] = []
+        _util.save_state(session, state)
+    return seen
 
 
 def attention_line():
@@ -40,11 +55,17 @@ def run(payload):
     name = vaultlib.CONFIG.get("name") or vaultlib.VAULT_ROOT.name
     find = _util.cli("find")
     if source == "compact":
-        _util.emit_context("SessionStart",
-                           "Context was just compacted. The %s knowledge vault is still your "
-                           "retrieval layer: before touching an area again, `%s <module words>` or "
-                           "`%s --paths <files>` instead of re-exploring code you already read."
-                           % (name, find, find))
+        lines = ["Context was just compacted. The %s knowledge vault is still your "
+                 "retrieval layer: before touching an area again, `%s <module words>` or "
+                 "`%s --paths <files>` instead of re-exploring code you already read."
+                 % (name, find, find)]
+        in_play = rearm(payload.get("session_id", "unknown"))
+        if in_play:
+            more = len(in_play) - MAX_IN_PLAY
+            lines.append("Notes in play before the compaction, no longer in your context: %s%s. "
+                         "Re-read the ones you are still working on before changing their files."
+                         % (", ".join(in_play[:MAX_IN_PLAY]), " (+%d more)" % more if more > 0 else ""))
+        _util.emit_context("SessionStart", "\n".join(lines))
         return
     repo = vaultlib.MATCHED_REPO[0] if vaultlib.MATCHED_REPO else "this project"
     lines = [

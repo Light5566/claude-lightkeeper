@@ -2,6 +2,18 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.5.0 - 2026-11-05
+
+### Added
+- **The file pointer also fires on reads.** PreToolUse now matches `Read` as well as the edit tools, so the note that owns a file arrives the first time the agent opens it, while it is still planning, not only when it is about to write. Same once-per-note rule. Claude Code makes the agent read a file before editing it, so the read pointer is usually the one that fires, and it carries the definition-of-done line.
+- **`vault status --session`** shows what the hooks did in the latest session, or in one picked with `--session=ID`: how often each hook ran and how often it told the agent something, the notes they surfaced, and which of those the vault has updated since the session started. `--json` for scripts. To make this possible, the hook runner now counts every run in the per-session state.
+
+### Fixed
+- **After a compaction, the hints and the pointer name a note again.** The once-per-session state survived compaction, so every note surfaced before it stayed silent afterwards, although its text had left the context with the summary. The post-compaction reminder now lists the notes that were in play and re-arms them.
+
+### Unchanged
+- Hermes Agent: the pointer still arrives with the result of `write_file` and `patch`; reads are not wired there yet. Its hook runs count in the same session report.
+
 ## 2.4.4 - 2026-10-21
 
 ### Changed

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""PreToolUse hook (Write|Edit|MultiEdit|NotebookEdit): when the file about to
-be edited is documented by a vault note the agent hasn't been pointed at this
-session, inject the pointer BEFORE the edit lands. A stub note gets different
+"""PreToolUse hook (Read|Write|Edit|MultiEdit|NotebookEdit): when the file about
+to be read or edited is documented by a vault note the agent hasn't been pointed
+at this session, inject the pointer. On a Read it arrives while the agent is
+still planning, which is when a Gotcha can change the plan; Claude Code makes
+the agent read a file before editing it, so the read pointer usually fires
+first and carries the definition-of-done line too. A stub note gets different
 wording: there is nothing to read yet, so the ask is to write what you learn.
 
 Emits only additionalContext, no permissionDecision, so it can never block
@@ -77,8 +80,12 @@ def run(payload):
                 r = (": " + vaultlib.trim(reason, 60)) if reason else ""
                 bits.append("%s %s%s" % (d, other, r))
             lines.append("  connected — %s" % "; ".join(bits))
-    lines.append("If this change alters behavior, updating the note afterwards "
-                 "is part of the definition of done.")
+    if _util.is_read(payload):
+        lines.append("If you change this file and the change alters behavior, updating "
+                     "the note afterwards is part of the definition of done.")
+    else:
+        lines.append("If this change alters behavior, updating the note afterwards "
+                     "is part of the definition of done.")
 
     seen.update(fresh)
     state["seen"] = sorted(seen)

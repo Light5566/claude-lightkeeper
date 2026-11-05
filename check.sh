@@ -146,7 +146,7 @@ d = {}
 for a in sys.argv[1:]:
     k, _, v = a.partition("="); d[k] = v
 if "file_path" in d:
-    d["tool_name"] = "Edit"; d["tool_input"] = {"file_path": d.pop("file_path")}
+    d["tool_name"] = d.pop("tool", "Edit"); d["tool_input"] = {"file_path": d.pop("file_path")}
 print(json.dumps(d))' "$@" | CLAUDE_PROJECT_DIR="${HOOK_PROJECT:-$repo}" python3 "$here/lib/hooks/run.py" "$name" 2>&1
 }
 sid="sess-$RANDOM"
@@ -155,10 +155,16 @@ expect_silent "silent on resume" "" "$(hook session_start source=resume cwd=$rep
 expect_in "post-compaction reminder" "compacted" "$(hook session_start source=compact cwd=$repo session_id=$sid)"
 expect_in "prompt hint matches a note name" "Payment" "$(hook prompt_hint "prompt=please fix the payment flow timeout" cwd=$repo session_id=$sid)"
 expect_silent "same note not hinted twice" "" "$(hook prompt_hint "prompt=payment again please" cwd=$repo session_id=$sid)"
+expect_in "after a compaction the notes in play are named" "Notes in play before the compaction.*Payment" "$(hook session_start source=compact cwd=$repo session_id=$sid)"
+expect_in "after a compaction the hint names the note again" "Payment" "$(hook prompt_hint "prompt=payment again please" cwd=$repo session_id=$sid)"
 expect_in "decision nudge" "6 Decisions" "$(hook prompt_hint "prompt=the client said refunds go through support from now on" cwd=$repo session_id=$sid-d)"
 expect_in "pre-edit pointer on an owned file" "documented by vault note" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-f)"
 expect_in "stub wording on a stub's file" "still a stub" "$(hook file_guard file_path=$repo/routes/orders.php cwd=$repo session_id=$sid-f)"
 expect_silent "no pointer for an unowned file" "" "$(hook file_guard file_path=$repo/README.md cwd=$repo session_id=$sid-f)"
+out=$(hook file_guard tool=Read file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-r)
+expect_in "read pointer on an owned file" "documented by vault note" "$out"
+expect_in "read pointer carries the definition-of-done line" "If you change this file" "$out"
+expect_silent "no second pointer when the file read is then edited" "" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-r)"
 echo "// change" >> "$repo/app/Services/PaymentService.php"
 git -C "$tmp/vault" init -q 2>/dev/null; git -C "$tmp/vault" config user.email t@example.com; git -C "$tmp/vault" config user.name t
 git -C "$tmp/vault" add -A >/dev/null; GIT_COMMITTER_DATE="2020-01-01T00:00:00" git -C "$tmp/vault" commit -q -m "seed" --date="2020-01-01T00:00:00" >/dev/null 2>&1 || true
@@ -223,6 +229,14 @@ echo "$out"; grep -q "^FAIL" <<<"$out" && fail=1
 
 echo "- Another gotcha." >> "$tmp/vault/2 Modules/Payment.md"
 expect_silent "stop reminder quiet when the vault is dirty" "" "$(hook stop_reminder cwd=$repo session_id=$sid-s2)"
+out=$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session=$sid 2>&1)
+expect_in "session report counts the prompt hints" "prompt hints .* with a message" "$out"
+expect_in "session report counts the compactions" "after a compaction" "$out"
+expect_in "session report: a surfaced note that changed is updated" "updated in the vault since the session started: Payment" "$out"
+expect_in "session report: read and edit pointers counted apart" "read pointer .*never ran" "$out"
+expect_in "session report picks the latest session" "^Session " "$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session 2>&1)"
+out=$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session=nope 2>&1); rc=$?
+[ $rc -ne 0 ] && expect_in "session report explains an unknown session" "No session" "$out" || bad "session report explains an unknown session" "$out"
 expect_silent "silent for an uncovered repo" "" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
 expect_silent "garbage payload is a no-op" "" "$(printf '%s' "not json" | CLAUDE_PROJECT_DIR="$repo" python3 "$here/lib/hooks/run.py" prompt_hint 2>&1)"
 

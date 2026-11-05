@@ -12,7 +12,7 @@ Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent plugin too. It k
 
 - a **session primer** that tells the agent the map exists and how to query it,
 - **prompt hints** that surface the notes relevant to what you just asked,
-- a **pre-edit pointer** at the note that owns the file about to change,
+- a **file pointer** at the note that owns a file, the first time the agent reads or edits it,
 - a **Stop reminder** that names the exact notes the session's changed files belong to when the map didn't move,
 - **maintenance signals** that say which notes have grown too long, gone stale while their code moved, or claim files that no longer exist.
 
@@ -30,10 +30,10 @@ Payment  (module/shipped/full, updated 2026-10-02)
     ← Refund — a refund reverses the gateway charge through Payment::reverse()
 ```
 
-When the agent then edits `app/Services/PaymentService.php`, the pre-edit hook says:
+When the agent then opens `app/Services/PaymentService.php`, the file pointer says:
 
 > `app/Services/PaymentService.php` is documented by vault note "Payment" (updated 2026-10-02) — read its Gotchas before going further.
-> If this change alters behavior, updating the note afterwards is part of the definition of done.
+> If you change this file and the change alters behavior, updating the note afterwards is part of the definition of done.
 
 And when it tries to stop without touching the map:
 
@@ -107,9 +107,9 @@ All advisory. None can block an edit, and all of them are silent no-ops in a rep
 | Event | What it says | When it stays quiet |
 |---|---|---|
 | SessionStart | where the vault is, how to query it, that updating it is part of done; once a day, what needs attention | on resume |
-| SessionStart (after compaction) | re-query the vault instead of re-exploring code you already read | |
+| SessionStart (after compaction) | re-query the vault instead of re-exploring code you already read; names the notes that were in play, whose text the compaction dropped, and lets the hints and the pointer name them again | |
 | UserPromptSubmit | up to three notes whose names, aliases or flags appear in your prompt, with their one-liners and nearest neighbours; once per session, a nudge when the prompt sounds like a decision or a ruling | nothing new matches |
-| PreToolUse (Write/Edit) | the note that owns the file about to change, with its neighbours; for a stub, "nothing recorded yet, write what you learn" | the file is unowned, or you were already pointed at that note |
+| PreToolUse (Read/Write/Edit) | the note that owns the file about to be read or changed, with its neighbours; on a Read it arrives while the agent is still planning; for a stub, "nothing recorded yet, write what you learn" | the file is unowned, or you were already pointed at that note |
 | Stop | watched files changed in the last 6 hours but no note moved; names the owning notes and counts files that match no note | the vault is dirty or was committed within the window |
 
 ## Writing notes
@@ -130,6 +130,7 @@ vault find --paths <files>      which notes own these files
 vault check [--write]           lint; --write also rebuilds the index and regenerates
                                 Coverage.md, Vault Changelog.md, Attention.md and World.canvas
 vault status                    coverage, stale notes, attention, sync drift on one screen
+vault status --session          what the hooks did in the latest session: runs, notes surfaced, notes updated
 vault sync [target] [--advance] what landed on the repos since the vault last caught up
 vault log <note>                that note's git history
 vault export --html <file>      a self-contained interactive map

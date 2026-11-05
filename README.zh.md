@@ -12,7 +12,7 @@ Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 插件运�
 
 - **会话引导**：告诉 agent 地图在哪、怎么查；
 - **提示词匹配**：你刚问的问题涉及哪些笔记，立刻列出来；
-- **编辑前指引**：改某个文件之前，先指向拥有这个文件的笔记；
+- **文件指引**：agent 第一次读或改某个文件时，指向拥有这个文件的笔记；
 - **Stop 提醒**：代码改了但地图没动时，点名这次改动属于哪些笔记；
 - **维护信号**：哪些笔记太长了、代码变了笔记却没变、引用的文件已经不存在。
 
@@ -30,10 +30,10 @@ Payment  (module/shipped/full, updated 2026-10-02)
     ← Refund — a refund reverses the gateway charge through Payment::reverse()
 ```
 
-接着 agent 去改 `app/Services/PaymentService.php` 时，编辑前 hook 会说：
+接着 agent 打开 `app/Services/PaymentService.php` 时，文件指引会说：
 
 > `app/Services/PaymentService.php` is documented by vault note "Payment" (updated 2026-10-02) — read its Gotchas before going further.
-> If this change alters behavior, updating the note afterwards is part of the definition of done.
+> If you change this file and the change alters behavior, updating the note afterwards is part of the definition of done.
 
 当它想在没碰地图的情况下结束会话时：
 
@@ -107,9 +107,9 @@ Payment  (module/shipped/full, updated 2026-10-02)
 | 事件 | 说什么 | 什么时候不说话 |
 |---|---|---|
 | SessionStart | vault 在哪、怎么查、更新它是完成的一部分；每天一次报告需要关注的笔记数 | resume 时 |
-| SessionStart（压缩上下文后） | 重新查 vault，别再把读过的代码读一遍 | |
+| SessionStart（压缩上下文后） | 重新查 vault，别再把读过的代码读一遍；列出压缩前用到、正文已被压缩掉的笔记，并让提示和指引重新指向它们 | |
 | UserPromptSubmit | 最多三篇名字、别名或 flag 出现在你提示词里的笔记，附一句话简介和相邻笔记；每个会话一次，当提示词听起来像一个决定或裁定时提醒记录到 Decisions | 没有新匹配 |
-| PreToolUse（Write/Edit） | 即将修改的文件归哪篇笔记管，以及它的邻居；存根笔记会说"还没记录任何内容，把你学到的写上去" | 文件无人认领，或本会话已经指过这篇笔记 |
+| PreToolUse（Read/Write/Edit） | 即将读取或修改的文件归哪篇笔记管，以及它的邻居；读取时就提示，agent 还在规划阶段；存根笔记会说"还没记录任何内容，把你学到的写上去" | 文件无人认领，或本会话已经指过这篇笔记 |
 | Stop | 过去 6 小时里被监视的文件变了但没有笔记变动；点名拥有者笔记，并统计没有笔记认领的文件 | vault 工作区有未提交改动，或在时间窗内已提交 |
 
 ## 怎么写笔记
@@ -130,6 +130,7 @@ vault find --paths <files>      这些文件归哪些笔记管
 vault check [--write]           检查；--write 还会重建索引并重新生成
                                 Coverage.md、Vault Changelog.md、Attention.md 和 World.canvas
 vault status                    覆盖率、过期笔记、需要关注的项、同步落后情况，一屏看完
+vault status --session          最近一个会话里 hook 做了什么：运行次数、提到的笔记、哪些已更新
 vault sync [target] [--advance] 自上次对账以来仓库里落地了什么
 vault log <note>                这篇笔记的 git 历史
 vault export --html <file>      一个自包含的交互式地图
