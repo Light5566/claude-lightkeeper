@@ -257,11 +257,11 @@ python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vaul
 |---|---|
 | Session primer | as in Claude Code, including the short reminder after a compaction |
 | Prompt hints | as in Claude Code |
-| File pointer | before `apply_patch` lands, for every file the patch adds, updates, deletes or moves. Codex has no read tool, so there is no read pointer |
+| File pointer | for every file an `apply_patch` adds, updates, deletes or moves. The agent reads it with the patch's result, so it learns the owning note just after the edit, as in Hermes. Codex reads files through the shell, so there is no read pointer: what names notes before any edit is the prompt hint and the primer |
 | Stop reminder | shown to you, and once per session sent back to the agent as its next prompt: Codex's Stop hook has no context channel, so the adapter uses `decision: block` with the reminder as the reason |
 | Skills | `knowledge-vault`, `vault-sync` and `vault-tidy`. The five slash commands are Claude Code's; in Codex, use the `vault` CLI |
 
-Codex may ask you to review the plugin's hooks before they run. The adapter is tested against Codex's published hook schemas with fake payloads (`bash check.sh`); it has not yet been run in a live Codex session.
+The first time the Codex TUI starts after the install, it asks you to review the plugin's hooks: trust all four. A hook switched off there stays off until you switch it back on in `/hooks`. Tested with a real model on Codex CLI 0.166.0-alpha.6 in `codex exec` mode, covering the session primer, prompt hints with a glossary term, the file pointer on `apply_patch`, and both Stop paths: quiet once the note is updated; otherwise the reminder goes back to the agent, which updates the note or says why not, and the next Stop stays quiet. Not yet verified: interactive TUI sessions and turns after a context compaction. For development, `bash check.sh` drives the adapter with fake payloads.
 
 ## Not included, on purpose
 

@@ -257,11 +257,11 @@ python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vaul
 |---|---|
 | 会话引导 | 和 Claude Code 一样，包括压缩上下文后的简短提醒 |
 | 提示词匹配 | 和 Claude Code 一样 |
-| 文件指引 | 在 `apply_patch` 落地之前，补丁新增、修改、删除或移动的每个文件都会提示。Codex 没有读文件的工具，所以没有读取时的提示 |
+| 文件指引 | `apply_patch` 新增、修改、删除或移动的每个文件都会提示。agent 和补丁的结果一起读到它，所以是在编辑之后马上知道文件归哪篇笔记，和 Hermes 一样。Codex 通过 shell 读文件，所以没有读取时的提示：在任何编辑之前就点名笔记的，是提示词匹配和会话引导 |
 | Stop 提醒 | 显示给你，并且每个会话一次作为下一条提示发回给 agent：Codex 的 Stop hook 没有上下文通道，适配层用 `decision: block`，把提醒作为理由 |
 | Skill | `knowledge-vault`、`vault-sync` 和 `vault-tidy`。五个斜杠命令是 Claude Code 的；在 Codex 里用 `vault` 命令行 |
 
-Codex 可能会在运行前请你审核插件的 hook。适配层用假的 payload 对照 Codex 公开的 hook schema 测过（`bash check.sh`），还没有在真实的 Codex 会话里跑过。
+安装后第一次启动 Codex TUI 时，它会请你审核插件的 hook：四个都要信任。在那里被关掉的 hook 会一直关着，直到你在 `/hooks` 里重新打开。已在 Codex CLI 0.166.0-alpha.6 的 `codex exec` 模式用真实模型测试，覆盖会话引导、带术语表词条的提示词匹配、`apply_patch` 上的文件指引，以及 Stop 的两条路径：笔记已更新时保持安静；否则提醒发回给 agent，由它更新笔记或说明为什么不需要，下一次 Stop 保持安静。交互式 TUI 会话和上下文压缩后的行为尚未验证。开发时，`bash check.sh` 用假的 payload 驱动适配层。
 
 ## 刻意不做的事
 
