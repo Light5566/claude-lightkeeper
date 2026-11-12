@@ -2,11 +2,20 @@
 
 [![Listed on ClaudePluginHub](https://www.claudepluginhub.com/badge/light5566-lightkeeper)](https://www.claudepluginhub.com/plugins/light5566-lightkeeper?ref=badge)
 
-**A knowledge map of your codebase that Claude reads before it edits and updates before it stops.**
+**A knowledge map of your codebase that your coding agent reads before it edits and updates before it stops.** For Claude Code, Hermes Agent and Codex.
 
 [English](README.md) · [中文](README.zh.md) · [Live gallery](https://light5566.github.io/claude-lightkeeper/) (interactive maps of Excalidraw, Mastodon, Gitea, Paperless-ngx and BookStack) · [Changelog](CHANGELOG.md)
 
 ![Claude Code beside Obsidian: Claude checks the map before changing code, then updates the note that owns the file it edited](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
+
+A coding agent rediscovers your codebase every session, and a long session loses what it read when its context is compacted. Lightkeeper writes down what the agent should know, and hooks put the right note in front of it at the moment it opens the file.
+
+```
+/plugin marketplace add Light5566/claude-lightkeeper
+/plugin install lightkeeper@claude-lightkeeper
+```
+
+That is the Claude Code install; the rest of the setup is in [Install, from zero](#install-from-zero). For the other two, see [Hermes Agent](#hermes-agent) and [Codex](#codex).
 
 Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent and a Codex plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases, the words it uses in its own way) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 

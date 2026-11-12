@@ -2,11 +2,20 @@
 
 [![Listed on ClaudePluginHub](https://www.claudepluginhub.com/badge/light5566-lightkeeper)](https://www.claudepluginhub.com/plugins/light5566-lightkeeper?ref=badge)
 
-**一张代码库的知识地图：Claude 改代码前先读它，结束前必须更新它。**
+**一张代码库的知识地图：你的编程 agent 改代码前先读它，结束前必须更新它。** 支持 Claude Code、Hermes Agent 和 Codex。
 
 [English](README.md) · [中文](README.zh.md) · [在线画廊](https://light5566.github.io/claude-lightkeeper/)（Excalidraw、Mastodon、Gitea、Paperless-ngx 和 BookStack 的交互式代码地图）· [更新日志](CHANGELOG.md)
 
 ![Claude Code 与 Obsidian 并排：改代码前先查地图，改完后更新拥有该文件的笔记](https://light5566.github.io/claude-lightkeeper/assets/demo-v3.gif)
+
+编程 agent 每开一个会话都要重新认识你的代码库；长会话的上下文一被压缩，它读过的内容也跟着丢了。Lightkeeper 把 agent 应该知道的东西写下来，再用 hook 在它打开文件的那一刻，把对应的笔记送到它面前。
+
+```
+/plugin marketplace add Light5566/claude-lightkeeper
+/plugin install lightkeeper@claude-lightkeeper
+```
+
+这是 Claude Code 的安装命令，其余步骤见[从零安装](#从零安装)。另外两个见 [Hermes Agent](#hermes-agent) 和 [Codex](#codex)。
 
 Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 和 Codex 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本，以及它自己用法特殊的词）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
