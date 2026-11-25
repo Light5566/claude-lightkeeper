@@ -22,6 +22,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 VAULT_ROOT = None      # set by init()
@@ -561,6 +562,96 @@ def project_of(cwd):
     if not top:
         return None, None
     return top, (_git(["remote", "get-url", "origin"], top) or "")
+
+
+# --- which branch a note was last written on --------------------------------------
+# The vault is one map for every branch and worktree, so a note written on a
+# feature branch is also what an agent on main reads. The hooks record, per note,
+# the branch and commit of the checkout the agent was in when it edited the note;
+# the file pointer then says so when that branch isn't in the current checkout.
+# The record is machine-local (beside the registry, never in the vault): it is
+# trusted only while the note's mtime still matches the recorded edit, so a note
+# changed since by hand, by a pull or on another machine is simply not judged.
+# ponytail: per-machine only; move the record into the vault (keyed by content
+# hash, not mtime) if teams need a colleague's branch notes flagged too.
+BRANCH_NOTES = Path(str(REGISTRY) + "-branches.json")
+BRANCH_NOTE_SLACK = 60  # seconds between the hook run and the note's write
+
+
+def _branch_notes():
+    try:
+        data = json.loads(BRANCH_NOTES.read_text())
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _checkout(cwd):
+    """(git common dir, branch or "" when detached, HEAD sha) of the checkout at cwd, or None."""
+    if not cwd or not os.path.isdir(cwd):
+        return None
+    common, sha = _git(["rev-parse", "--git-common-dir"], cwd), _git(["rev-parse", "HEAD"], cwd)
+    if not common or not sha:
+        return None
+    branch = _git(["symbolic-ref", "--quiet", "--short", "HEAD"], cwd) or ""
+    return os.path.realpath(os.path.join(cwd, common)), branch, sha
+
+
+def record_note_branch(note_path, cwd):
+    """Remember that the note at note_path was edited from the checkout at cwd."""
+    here = _checkout(cwd)
+    if not here or VAULT_ROOT is None:
+        return
+    try:
+        rel = str(Path(note_path).resolve().relative_to(Path(VAULT_ROOT).resolve()))
+    except ValueError:
+        return
+    data = _branch_notes()
+    data.setdefault(str(VAULT_ROOT), {})[rel] = {
+        "repo": here[0], "branch": here[1], "sha": here[2], "at": time.time()}
+    try:
+        tmp = str(BRANCH_NOTES) + ".tmp%d" % os.getpid()
+        Path(tmp).write_text(json.dumps(data, indent=1) + "\n")
+        os.replace(tmp, BRANCH_NOTES)
+    except OSError:
+        pass
+
+
+def note_branch_drift(note_rel, cwd):
+    """The branch (or short sha) a note was last written on, when the checkout at
+    cwd does not contain that work; None when it does or when nothing is known."""
+    rec = (_branch_notes().get(str(VAULT_ROOT)) or {}).get(note_rel)
+    here = _checkout(cwd)
+    if not rec or not here or rec.get("repo") != here[0]:
+        return None
+    try:
+        mtime = os.path.getmtime(os.path.join(str(VAULT_ROOT), note_rel))
+    except OSError:
+        return None
+    if abs(mtime - float(rec.get("at") or 0)) > BRANCH_NOTE_SLACK:
+        return None  # the note changed since (or the recorded edit never landed)
+    branch, sha = rec.get("branch") or "", rec.get("sha") or ""
+    if branch and branch == here[1]:
+        return None
+    # the branch's tip when it still exists (it holds commits made after the note), else the commit
+    ref = sha
+    if branch and _git(["rev-parse", "--verify", "--quiet", "refs/heads/" + branch], cwd):
+        ref = "refs/heads/" + branch
+    if not ref or _git(["cat-file", "-e", ref + "^{commit}"], cwd) is None:
+        return None
+    if _git(["merge-base", "--is-ancestor", ref, "HEAD"], cwd) is not None:
+        return None
+    return branch or sha[:10]
+
+
+def branch_drifts(cwd):
+    """[(note rel path, branch)] for every recorded note this checkout doesn't contain."""
+    out = []
+    for rel in sorted(_branch_notes().get(str(VAULT_ROOT)) or {}):
+        b = note_branch_drift(rel, cwd)
+        if b:
+            out.append((rel, b))
+    return out
 
 
 def read_registry():

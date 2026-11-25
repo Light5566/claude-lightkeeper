@@ -180,7 +180,10 @@ def main(argv):
     except Exception:
         pass
 
+    drifts = vaultlib.branch_drifts(vaultlib.PROJECT_ROOT or os.getcwd())
+
     report = {
+        "branch_notes": [{"note": n, "branch": b} for n, b in drifts],
         "vault": str(root), "name": cfg.get("name") or root.name,
         "notes": len(notes), "typed": len(typed), "by_type": by_type,
         "edges": len(idx["links"]), "owned_paths": len(idx["paths"]),
@@ -214,6 +217,9 @@ def main(argv):
         print("attention: nothing (as of %s)" % (status.get("built_at") or "?")[:16])
     else:
         print("attention: not computed yet — run `vault check --write`")
+    if drifts:
+        print("branch notes: %d last updated on a branch this checkout doesn't contain — %s" % (
+            len(drifts), ", ".join("%s (%s)" % (Path(n).stem, b) for n, b in drifts[:6]) + (" …" if len(drifts) > 6 else "")))
     for s in report["sync"]:
         if s["error"]:
             print("sync %s: %s" % (s["target"], s["error"]))

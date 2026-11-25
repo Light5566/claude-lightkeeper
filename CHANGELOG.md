@@ -2,6 +2,15 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.9.0 - 2026-11-25
+
+### Added
+- **Branch-tied notes.** The vault is one map for every branch and worktree, so a note written on a feature branch is also what an agent on `main` reads. The hooks now remember, per note, the branch and commit of the checkout the agent was in when it edited the note. When the file pointer names a note that was last written on a branch the current checkout doesn't contain, it adds one line saying so and telling the agent to check the note against the code in front of it. On the branch itself, and once the branch is merged, it says nothing. `vault status` lists these notes on a `branch notes:` line (`branch_notes` in `--json`). Works the same in Claude Code, Hermes Agent and Codex.
+- The record is kept per machine in `~/.claude/vaults-branches.json`, beside the registry; nothing is written into the vault or the repo. It is trusted only while the note's modification time still matches the recorded edit, so a note changed since by hand, by a pull or on another machine is not judged.
+
+### Fixed
+- The file pointer now recognises the vault's own files through a symlinked path (for example `/var` and `/private/var` on macOS), so editing a note never triggers a pointer.
+
 ## 2.8.0 - 2026-11-05
 
 ### Added

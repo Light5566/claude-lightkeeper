@@ -23,8 +23,12 @@ def run(payload):
     fp = tool_input.get("file_path") or tool_input.get("notebook_path")
     if not fp or not isinstance(fp, str):
         return
-    if fp.startswith(str(vaultlib.VAULT_ROOT)):
-        return  # never hint while editing the vault itself
+    cwd = payload.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR")
+    if os.path.realpath(fp).startswith(os.path.realpath(str(vaultlib.VAULT_ROOT)) + os.sep):
+        # never hint while editing the vault itself; remember which branch the note was written on
+        if fp.endswith(".md") and not _util.is_read(payload):
+            vaultlib.record_note_branch(fp, cwd)
+        return
 
     session = payload.get("session_id", "unknown")
     state = _util.load_state(session)
@@ -73,6 +77,12 @@ def run(payload):
             lines.append(
                 "`%s` is documented by vault note \"%s\" (updated %s) — read its Gotchas "
                 "before going further: %s" % (rel, stem, note["updated"] or "?", where))
+            drift = vaultlib.note_branch_drift(note["path"], cwd)
+            if drift:
+                lines.append(
+                    "  this note was last updated on `%s`, which this checkout does not contain: "
+                    "it may describe code that isn't here. Check it against the code in front "
+                    "of you before relying on it." % drift)
         nbrs = vaultlib.neighbors(idx, stem, 3)
         if nbrs:
             bits = []

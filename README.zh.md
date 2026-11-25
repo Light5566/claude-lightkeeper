@@ -66,6 +66,8 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
 代价是：地图的更新是另一个仓库里的另一次提交，git 无法把两者绑在一起。这正是 hook 和 `vault check` 这套仪式存在的原因。
 
+所有分支共用一张地图也有一个问题：在功能分支上写的笔记，`main` 上的 agent 也会读到。所以 hook 会记下每篇笔记最后是在哪个分支上改的。当 agent 打开一个文件，而它的笔记最后写在当前 checkout 不包含的分支上，文件指针会说明这一点，并让 agent 先对照眼前的代码。分支合并后，提示自动消失。`vault status` 会列出这些笔记。记录只保存在本机（和 vault 注册表放在一起），不会写进 vault 或代码仓库。
+
 ## 从零安装
 
 **需要：** [Claude Code](https://code.claude.com)、git、PATH 里有 Python 3.9 或更新版本（macOS 和大多数 Linux 自带）。Obsidian 可选但推荐：[obsidian.md/download](https://obsidian.md/download) 或 `brew install --cask obsidian`。

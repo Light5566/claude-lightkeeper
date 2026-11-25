@@ -66,6 +66,8 @@ Use a memory tool *and* this. They answer different questions.
 
 The cost: a map update is a separate commit in a separate repo, so git cannot couple them. That is exactly what the hooks and the `vault check` ritual are for.
 
+One map for every branch has a catch: a note written on a feature branch is also what an agent on `main` reads. So the hooks remember which branch a note was last edited on. When the agent opens a file whose note was last written on a branch the current checkout doesn't contain, the file pointer says so and tells it to check the note against the code in front of it. Once the branch is merged, the warning stops by itself. `vault status` lists these notes. The record is kept per machine, beside the vault registry, and nothing is written into the vault or the repo.
+
 ## Install, from zero
 
 **You need:** [Claude Code](https://code.claude.com), git, and Python 3.9 or newer on your PATH (macOS and most Linux distributions ship it). Obsidian is optional but recommended: get it at [obsidian.md/download](https://obsidian.md/download) or `brew install --cask obsidian`.

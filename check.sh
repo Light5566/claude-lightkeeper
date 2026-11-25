@@ -191,6 +191,23 @@ out=$(hook file_guard tool=Read file_path=$repo/app/Services/PaymentService.php 
 expect_in "read pointer on an owned file" "documented by vault note" "$out"
 expect_in "read pointer carries the definition-of-done line" "If you change this file" "$out"
 expect_silent "no second pointer when the file read is then edited" "" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-r)"
+
+# --- branch-tied notes: a note edited on a branch is flagged in a checkout without that branch
+git -C "$repo" switch -q -c feature; git -C "$repo" commit -q --allow-empty -m "feature work"
+hook file_guard "file_path=$tmp/vault/2 Modules/Payment.md" cwd=$repo session_id=$sid-b >/dev/null; touch "$tmp/vault/2 Modules/Payment.md"
+grep -q '"branch": "feature"' "$CLAUDE_VAULTS_REGISTRY-branches.json" && ok "editing a note records the branch" || bad "editing a note records the branch" "$(cat "$CLAUDE_VAULTS_REGISTRY-branches.json" 2>&1)"
+out=$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-b1)
+grep -q "last updated on" <<<"$out" && bad "no branch warning on the branch itself" "$out" || ok "no branch warning on the branch itself"
+git -C "$repo" switch -q main
+expect_in "pointer warns when the note's branch isn't in this checkout" 'last updated on `feature`' "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-b2)"
+expect_in "vault status lists the branch note" "branch notes: 1 .*Payment (feature)" "$(cd "$repo" && python3 "$here/lib/status.py" --vault "$tmp/vault" 2>&1)"
+touch -t 202001010000 "$tmp/vault/2 Modules/Payment.md"
+out=$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-b3)
+grep -q "last updated on" <<<"$out" && bad "a note changed since the record is not judged" "$out" || ok "a note changed since the record is not judged"
+touch "$tmp/vault/2 Modules/Payment.md"; git -C "$repo" merge -q --ff-only feature
+out=$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-b4)
+grep -q "last updated on" <<<"$out" && bad "no branch warning once the branch is merged" "$out" || ok "no branch warning once the branch is merged"
+git -C "$repo" reset -q --hard HEAD~1; git -C "$repo" branch -q -D feature; rm -f "$CLAUDE_VAULTS_REGISTRY-branches.json"
 echo "// change" >> "$repo/app/Services/PaymentService.php"
 git -C "$tmp/vault" init -q 2>/dev/null; git -C "$tmp/vault" config user.email t@example.com; git -C "$tmp/vault" config user.name t
 git -C "$tmp/vault" add -A >/dev/null; GIT_COMMITTER_DATE="2020-01-01T00:00:00" git -C "$tmp/vault" commit -q -m "seed" --date="2020-01-01T00:00:00" >/dev/null 2>&1 || true
