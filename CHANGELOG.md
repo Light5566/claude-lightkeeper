@@ -2,6 +2,12 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.10.0 - 2026-11-25
+
+### Added
+- **A glossary word can mean different things in different modules.** When a term appears in a prompt, the hint now gives its meaning, then one line per note it shows up in, taken from the reasons on its *Where it shows up* links (`in Payment: …`, `in Order: …`), up to three. Notes already in play this session, or named in the same prompt, come first. It ends with the first line of *Not to be confused with* (`not: …`), so a correct meaning isn't applied in the wrong place. A term whose links carry no reasons keeps the old `(shows up in …)` form.
+- The term template says to write a module's own meaning on that module's line, and what an outsider would wrongly assume under *Not to be confused with*. Existing term notes need no change; add reasons and that section to get the new lines.
+
 ## 2.9.0 - 2026-11-25
 
 ### Added

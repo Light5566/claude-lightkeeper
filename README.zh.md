@@ -129,7 +129,7 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
 - **唯一的规则：每个 `[[链接]]` 都带一个理由。** `- [[Invoice]] — a paid order raises an invoice through InvoiceService::create()`。理由会变成每条搜索结果旁边的"影响范围"；没有理由的链接只会把图谱变成一团毛线。
 - **模块笔记里的 *Where it lives* 表格是机器读的**：真实文件，每格第一个路径写完整，绝不写容器目录。编辑前 hook 就跑在这张文件→笔记的索引上。
-- **术语表。** 这个代码库用法特殊的词，在 `9 Glossary` 里写一篇短笔记（`type: term`）：它在这里是什么意思、出现在哪里。提示词里一出现这个词，提示就会附上它的意思，agent 不用去猜。
+- **术语表。** 这个代码库用法特殊的词，在 `9 Glossary` 里写一篇短笔记（`type: term`）：它在这里是什么意思、出现在哪里。提示词里一出现这个词，提示就会附上它的意思，agent 不用去猜。同一个词在不同模块里意思不同时，把每个意思写在 *Where it shows up* 里对应模块的那一行：提示会按模块列出意思，本次会话里已经用到的模块排在前面，并附上 *Not to be confused with* 的第一行。
 - **诚实字段。** `status: shipped` 表示代码在生产分支上；`depth: stub` 表示笔记还很薄；每次碰笔记都要更新 `updated:`。笔记可以是错的；代码和笔记不一致时，以代码为准，修正笔记是这次改动的一部分。
 
 脚手架里的 `_meta/Conventions.md` 和 `_meta/How to update.md` 有完整约定、触发表（什么样的改动该碰哪篇笔记）和"60 秒版本"。`knowledge-vault` skill 把这些教给 Claude。

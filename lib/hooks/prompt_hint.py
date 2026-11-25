@@ -2,8 +2,11 @@
 """UserPromptSubmit hook: match the prompt against note NAMES/ALIASES/FLAGS
 (tier 1 only, never content grep: precision over recall) and surface up to
 three notes the agent should read before working on those areas. Glossary
-notes (type: term) are listed apart, with their meaning, up to three more:
-a domain word the agent would otherwise guess at. A prompt that sounds like a
+notes (type: term) are listed apart, up to three more: a domain word the agent
+would otherwise guess at. Each comes with its meaning, then what it means in
+each note it shows up in (the reasons on its "Where it shows up" links, notes
+already in play this session first) and the first thing it is not to be
+confused with, so one word can mean different things in different modules. A prompt that sounds like a
 decision or a ruling gets a one-line nudge, once per session, to record the
 why in 6 Decisions/.
 
@@ -17,9 +20,30 @@ import vaultlib
 
 MAX_NOTES = 3
 MAX_NEIGHBORS = 2
+MAX_TERM_USES = 3
 DECISION = re.compile(
     r"\b(client (said|wants|asked|decided|confirmed)|we (decided|agreed)|"
     r"decided to|ruling|reversed the|from now on|going forward)\b", re.I)
+
+
+def term_lines(idx, stem, in_play):
+    """A glossary term for the hint: its meaning, its meaning per note, what it is not."""
+    note = idx["notes"][stem]
+    uses = [(o, r) for d, o, r in vaultlib.neighbors(idx, stem, 12) if d == "→"]
+    uses.sort(key=lambda t: t[0] not in in_play)  # stable: notes in play first
+    reasoned = [(o, r) for o, r in uses if r][:MAX_TERM_USES]
+    head = "- %s: %s" % (stem, note["summary"] or "no meaning written yet (%s)" % note["path"])
+    if uses and not reasoned:
+        head += " (shows up in %s)" % ", ".join(o for o, _r in uses[:MAX_TERM_USES])
+    out = [head] + ["    in %s: %s" % (o, vaultlib.trim(r, 110)) for o, r in reasoned]
+    try:
+        nots = vaultlib.bullets((vaultlib.VAULT_ROOT / note["path"]).read_text(), "Not to be confused with")
+    except OSError:
+        nots = []
+    nots = [n for n in nots if not n.startswith("_")]  # an unfilled template line
+    if nots:
+        out.append("    not: %s" % vaultlib.trim(nots[0], 110))
+    return out
 
 
 def run(payload):
@@ -41,11 +65,9 @@ def run(payload):
             pick.append((stem, matched_by))
     if terms:
         lines.append("Words in your prompt that this codebase defines (vault glossary):")
+        in_play = seen | {s for s, _mb in fresh}
         for stem, _mb in terms:
-            note = idx["notes"][stem]
-            where = [o for d, o, _r in vaultlib.neighbors(idx, stem, MAX_NEIGHBORS + 1) if d == "→"]
-            lines.append("- %s: %s%s" % (stem, note["summary"] or "no meaning written yet (%s)" % note["path"],
-                                         " (shows up in %s)" % ", ".join(where) if where else ""))
+            lines.extend(term_lines(idx, stem, in_play))
     if fresh:
         lines.append("Knowledge-vault notes likely relevant — read before changing these "
                      "areas (vault: %s):" % vaultlib.VAULT_ROOT)

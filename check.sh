@@ -154,6 +154,11 @@ The moment the gateway confirms the money moved, not the moment the customer pay
 ## Where it shows up
 
 - [[Payment]] — an order counts as paid only after settlement
+- [[Order]] — here it means the order is closed, not that money moved
+
+## Not to be confused with
+
+- The customer paying: that is authorisation.
 MD
 out=$(python3 "$here/lib/check.py" --vault "$tmp/vault" 2>&1 | sed -E -n '/^(ORPHANS|OFF-SCHEMA)/,/^$/p')
 grep -q "Settlement" <<<"$out" && bad "a term note raises no orphan or schema warning" "$out" || ok "a term note raises no orphan or schema warning"
@@ -182,7 +187,9 @@ expect_in "after a compaction the notes in play are named" "Notes in play before
 expect_in "after a compaction the hint names the note again" "Payment" "$(hook prompt_hint "prompt=payment again please" cwd=$repo session_id=$sid)"
 out=$(hook prompt_hint "prompt=why is this order not settled yet" cwd=$repo session_id=$sid-g)
 expect_in "prompt hint defines a glossary term" "Settlement: The moment the gateway confirms the money moved" "$out"
-expect_in "the term says where it shows up" "shows up in Payment" "$out"
+expect_in "the term gives its meaning per note" "in Payment: an order counts as paid only after settlement" "$out"
+expect_in "the term says what it is not" "not: The customer paying: that is authorisation." "$out"
+python3 -c 'import sys; o = sys.argv[1]; sys.exit(0 if -1 < o.find("in Order:") < o.find("in Payment:") else 1)' "$out" && ok "the note in play comes first for a term" || bad "the note in play comes first for a term" "$out"
 expect_in "decision nudge" "6 Decisions" "$(hook prompt_hint "prompt=the client said refunds go through support from now on" cwd=$repo session_id=$sid-d)"
 expect_in "pre-edit pointer on an owned file" "documented by vault note" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-f)"
 expect_in "stub wording on a stub's file" "still a stub" "$(hook file_guard file_path=$repo/routes/orders.php cwd=$repo session_id=$sid-f)"
