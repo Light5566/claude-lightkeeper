@@ -19,6 +19,9 @@ The first five minutes. A survey of eight similar tools and a walk through our o
 - **README.** The first screen is three lines to a working map and says nothing is written into your repo. Configuration, teams, keeping the map honest and branch notes moved to `docs/guide.md`; Hermes Agent and Codex to `docs/agents.md`. 3,483 words became 2,184. Same in 中文.
 - The Hermes and Codex install lines use the zero-argument `vault init`.
 
+### Fixed (26 Nov, after a walk through the first run)
+- `vault doctor` tells apart a launcher that isn't installed from one that is installed in `~/.local/bin` but not on your PATH, and gives the right line for each.
+
 ## 2.10.0 - 2026-11-25
 
 ### Added

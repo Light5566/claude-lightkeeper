@@ -103,8 +103,13 @@ def main(argv):
         print("ok   `vault` is on PATH")
     else:
         # the slash commands don't need it, so this is advice, not a failure
-        print("--   `vault` is not on PATH. The slash commands work without it; for the shell: "
-              "vault init --install-cli, or python3 %s" % (PLUGIN / "bin" / "vault"))
+        local = Path.home() / ".local" / "bin"
+        if (local / "vault").is_file():
+            print("--   `vault` is installed in %s, but that folder is not on your PATH. The slash "
+                  "commands work without it; for the shell: export PATH=\"$HOME/.local/bin:$PATH\"" % local)
+        else:
+            print("--   `vault` is not on PATH. The slash commands work without it; for the shell: "
+                  "python3 %s init --install-cli" % (PLUGIN / "bin" / "vault"))
     if root:
         print("to stop using this vault here: vault init --forget")
     return 1 if bad else 0
