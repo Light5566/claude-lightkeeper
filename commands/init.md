@@ -14,7 +14,7 @@ Run:
 python3 "${CLAUDE_PLUGIN_ROOT}/lib/init.py" $ARGUMENTS
 ```
 
-Show the user the output unchanged. It names the vault folder, the repos it watches, whether the `vault` CLI and the post-merge git hook were installed, and the result of the first `vault check --write`.
+Show the user the output unchanged. It names the vault folder, where it was registered, and whether the `vault` CLI and the git hooks were installed.
 
 Then tell the user, in two lines:
 

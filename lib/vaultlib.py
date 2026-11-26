@@ -949,7 +949,10 @@ GENERIC_STEMS = {"SKILL", "README", "CLAUDE", "LICENSE", "TODO", "CHANGELOG", "C
 def match_paths(idx, file_paths, cwd=None, project_dir=None):
     """Map file paths to owning notes. Returns [(stem, via, priority)] sorted,
     priority 0 = specific exact path, 1 = dir prefix, 2 = class/basename,
-    3 = shared path (owned by many notes)."""
+    3 = shared path (owned by many notes). A repo note (`type: repo`) that
+    mentions a file is an orientation page, not its owner: when another note
+    claims the same file, the repo note drops to priority 3 for that file."""
+    merged = {}
     results = {}
 
     def record(stem, via, prio):
@@ -957,7 +960,20 @@ def match_paths(idx, file_paths, cwd=None, project_dir=None):
         if cur is None or prio < cur[1]:
             results[stem] = (via, prio)
 
+    def is_repo(stem):
+        return idx["notes"].get(stem, {}).get("type") == "repo"
+
+    def flush():
+        if any(p < 3 and not is_repo(s) for s, (_v, p) in results.items()):
+            for s in [s for s in results if is_repo(s)]:
+                results[s] = (results[s][0], 3)
+        for s, (v, p) in results.items():
+            if s not in merged or p < merged[s][1]:
+                merged[s] = (v, p)
+        results.clear()
+
     for raw in file_paths:
+        flush()
         rel = LINE_ANCHOR.sub("", _relativize(raw, cwd, project_dir))
         owners = idx["paths"].get(rel)
         if owners:
@@ -991,8 +1007,9 @@ def match_paths(idx, file_paths, cwd=None, project_dir=None):
             for s in idx["classes"][cls]:
                 record(s, "class:%s" % cls, 2)
 
+    flush()
     return sorted(
-        ((stem, via, prio) for stem, (via, prio) in results.items()),
+        ((stem, via, prio) for stem, (via, prio) in merged.items()),
         key=lambda t: (t[2], -idx["notes"].get(t[0], {}).get("inbound", 0), t[0]),
     )
 

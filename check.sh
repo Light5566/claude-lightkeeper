@@ -199,6 +199,14 @@ expect_in "read pointer on an owned file" "documented by vault note" "$out"
 expect_in "read pointer carries the definition-of-done line" "If you change this file" "$out"
 expect_silent "no second pointer when the file read is then edited" "" "$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-r)"
 
+# --- a repo note that mentions a file doesn't take the pointer from the module that owns it
+rn=$(ls "$tmp/vault/8 Repos/"*.md | head -1); cp "$rn" "$tmp/rn.bak"
+printf '\nThe payment code is `app/Services/PaymentService.php`.\n' >> "$rn"
+out=$(hook file_guard file_path=$repo/app/Services/PaymentService.php cwd=$repo session_id=$sid-rp)
+expect_in "the module note still gets the pointer" 'vault note \\"Payment\\"' "$out"
+grep -q "8 Repos" <<<"$out" && bad "the repo note is not named as the owner" "$out" || ok "the repo note is not named as the owner"
+cp "$tmp/rn.bak" "$rn"
+
 # --- branch-tied notes: a note edited on a branch is flagged in a checkout without that branch
 git -C "$repo" switch -q -c feature; git -C "$repo" commit -q --allow-empty -m "feature work"
 hook file_guard "file_path=$tmp/vault/2 Modules/Payment.md" cwd=$repo session_id=$sid-b >/dev/null; touch "$tmp/vault/2 Modules/Payment.md"

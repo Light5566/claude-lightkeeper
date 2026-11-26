@@ -20,6 +20,8 @@ The first five minutes. A survey of eight similar tools and a walk through our o
 - The Hermes and Codex install lines use the zero-argument `vault init`.
 
 ### Fixed (26 Nov, after a walk through the first run)
+- **A repo note no longer takes the file pointer from the module that owns a file.** A `type: repo` note that mentions a file in its text was indexed as an owner and, having more inbound links, ranked first. When another note claims the same file, the repo note now counts as a weak match for it, so the pointer, the Stop reminder and `vault sync` name the module. Found in a live Claude Code run of init and seed on a fresh repo.
+- The init command no longer promises a check result that init doesn't print.
 - `vault doctor` tells apart a launcher that isn't installed from one that is installed in `~/.local/bin` but not on your PATH, and gives the right line for each.
 
 ## 2.10.0 - 2026-11-25
