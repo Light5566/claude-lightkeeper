@@ -7,6 +7,8 @@ All notable changes to Lightkeeper, formerly claude-vault. The plugin version li
 ### Changed
 - `SECURITY.md` added: how to report a vulnerability, and what the plugin does on your machine.
 - The GitHub Actions used by the PR comment action and the repo's own workflow are pinned to commit ids.
+- The Codex manifest (`.codex-plugin/plugin.json`) gains author, homepage, repository, license, a category, a long description, capabilities, two starter prompts and an icon; the short description fits Codex's 30-character limit.
+- `.github/dependabot.yml` keeps the pinned Actions current (monthly). `.codexignore` lists files Codex has no use for.
 
 ## 2.11.1 - 2026-11-26
 
