@@ -13,9 +13,10 @@
 ```
 /plugin marketplace add Light5566/claude-lightkeeper
 /plugin install lightkeeper@claude-lightkeeper
+/lightkeeper:init
 ```
 
-这是 Claude Code 的安装命令，其余步骤见[从零安装](#从零安装)。另外两个见 [Hermes Agent](#hermes-agent) 和 [Codex](#codex)。
+在 Claude Code 里三行，第三行在你的项目里运行。它为你所在的仓库建一张地图，然后提议根据代码写出第一批笔记。不会往你的仓库里写任何东西：地图放在 `~/vaults/<名字>`。用 [Hermes Agent 或 Codex](docs/agents.zh.md)？安装命令在那里。
 
 Lightkeeper 是一个 Claude Code 插件，也能作为 Hermes Agent 和 Codex 插件运行。它把"系统是怎么运作的"（模块、流程、集成、平台陷阱、决策、版本，以及它自己用法特殊的词）维护成一份 Obsidian 兼容的 Markdown 地图，放在代码仓库**之外**，并通过 agent 的 hook 让这张地图始终保持真实：
 
@@ -66,11 +67,9 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
 代价是：地图的更新是另一个仓库里的另一次提交，git 无法把两者绑在一起。这正是 hook 和 `vault check` 这套仪式存在的原因。
 
-所有分支共用一张地图也有一个问题：在功能分支上写的笔记，`main` 上的 agent 也会读到。所以 hook 会记下每篇笔记最后是在哪个分支上改的。当 agent 打开一个文件，而它的笔记最后写在当前 checkout 不包含的分支上，文件指针会说明这一点，并让 agent 先对照眼前的代码。分支合并后，提示自动消失。`vault status` 会列出这些笔记。记录只保存在本机（和 vault 注册表放在一起），不会写进 vault 或代码仓库。
-
 ## 从零安装
 
-**需要：** [Claude Code](https://code.claude.com)、git、PATH 里有 Python 3.9 或更新版本（macOS 和大多数 Linux 自带）。Obsidian 可选但推荐：[obsidian.md/download](https://obsidian.md/download) 或 `brew install --cask obsidian`。
+**需要：** [Claude Code](https://code.claude.com)、git、PATH 里有 Python 3.9 或更新版本（macOS 和大多数 Linux 自带）。Obsidian 可选：[obsidian.md/download](https://obsidian.md/download) 或 `brew install --cask obsidian`。
 
 1. **在 Claude Code 里安装插件：**
 
@@ -81,13 +80,13 @@ Payment  (module/shipped/full, updated 2026-10-02)
 
    或在 shell 里：`claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install lightkeeper@claude-lightkeeper`。
 
-2. **为一个或多个 checkout 创建 vault。** 在任意 Claude Code 会话中运行：
+2. **创建地图**，在项目里的会话中运行：
 
    ```
-   /lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+   /lightkeeper:init
    ```
 
-   这会生成脚手架（目录、约定、模板、Obsidian 配置、Bases 视图），写入描述它覆盖哪些仓库的 `_meta/vault.json`，把它登记到 `~/.claude/vaults`，把 `vault` 命令装到 `~/.local/bin`，并给 checkout 加上只报告、不拦截的 `post-merge` 和 `pre-push` 钩子。
+   不带参数时，它覆盖你所在的仓库，用文件夹名给 vault 命名，放在 `~/vaults/<名字>`，并把 `vault` 命令装到 `~/.local/bin`。它会先把这些选择给你看，问一次再动手。想自己决定：`/lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --repo ~/code/myapp-web --git-hook`。
 
 3. **从代码生成第一批笔记：**
 
@@ -95,16 +94,18 @@ Payment  (module/shipped/full, updated 2026-10-02)
    /lightkeeper:seed
    ```
 
-   Claude 提出领域划分和最多 60 个带真实文件路径的模块存根，征求你同意后写入。从这一刻起，第一次编辑就会触发编辑前指引。
+   Claude 提出领域划分和最多 60 个带真实文件路径的模块存根，征求你同意后写入。从这一刻起文件指针就会触发，当前会话也一样。会话引导从下一个会话开始出现。
 
-4. **在 Obsidian 里打开：** *Open folder as vault* → 选 `~/vaults/myapp`。图谱配色、Properties 面板和 Bases 视图都已配好。
+就这些。还有三件事值得知道：
 
-5. **在 checkout 里重启 Claude Code。** 会话引导出现，就完成了。
+- **看地图：** 在 Obsidian 里打开 vault 文件夹（*Open folder as vault*），或运行 `vault export --html map.html` 生成一个能在浏览器里打开的单页。
+- **检查是否正常：** `vault doctor` 在一屏里检查整个设置，每个问题旁边都给出修法。装了插件却没建地图时，在仓库里的第一个会话会提醒你一次。
+- **关掉它：** `vault init --forget` 让这个项目不再使用该 vault，并移除它装的 git 钩子。vault 文件夹原样保留。
 
 项目已经有 vault？一步克隆并登记：
 
 ```
-/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
+/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --git-hook
 ```
 
 已经有一个 Obsidian vault 想逐步迁入？`vault init --adopt ~/my-vault --name "My App" --repo ~/code/myapp` 只写配置并登记，不碰你的笔记；只有带 `type:` 的笔记才会被检查，可以慢慢来。
@@ -147,7 +148,10 @@ vault sync [target] [--advance] 自上次对账以来仓库里落地了什么
 vault log <note>                这篇笔记的 git 历史
 vault export --html <file>      一个自包含的交互式地图
 vault export --agents-md        给 AGENTS.md 的一段说明：地图在哪、怎么查、哪篇笔记管哪些代码
-vault init ...                  创建、克隆或接管一个 vault
+vault doctor                    这里装好了吗、在工作吗？每个问题旁边给出修法
+vault init                      在 git checkout 里：为这个仓库建 vault，全部用默认值
+vault init <path> --repo ...    自己决定：创建、克隆（--clone）或接管（--adopt）一个 vault
+vault init --forget             这里不再使用某个 vault；文件夹保留
 ```
 
 每个命令都接受 `--vault <path>`；不给的话，用覆盖当前目录的那个 vault。
@@ -156,69 +160,13 @@ vault init ...                  创建、克隆或接管一个 vault
 
 `vault check` 会抓出解析不了的链接、重名笔记、没有理由的链接、容器目录声明、不合规的 frontmatter、孤儿笔记、过期笔记，以及任何像密钥或个人数据的东西（邮箱、长数字串、API key 形状、私钥）。每次提交 vault 前都带 `--write` 跑一次。
 
-## 配置
-
-vault 里的 `_meta/vault.json`：
-
-```json
-{
-  "name": "My App",
-  "repos": {
-    "myapp":     {"remote": "github.com/acme/myapp", "watched": ["app", "routes", "database/migrations"],
-                  "production_ref": "origin/main", "version_log": "CHANGELOG.md"},
-    "myapp-web": {"remote": "github.com/acme/myapp-web", "watched": ["app", "components", "src"],
-                  "production_ref": "origin/main"},
-    "local-only": {"path": "~/code/experiment", "watched": ["src"]},
-    "ops":        {"remote": "github.com/acme/monorepo", "root": "apps/ops", "watched": ["src"]}
-  },
-  "generic_dirs": ["app/Services"],
-  "noise_files": ["TODO.md"],
-  "stop_window_hours": 6,
-  "tidy": {"max_words": 4000, "max_gotchas": 20, "stale_days": 60, "churn_commits": 5}
-}
-```
-
-- `repos` 是 hook 的路由依据：一个 checkout 按 `remote` 子串（任意 URL 形式）或 `path` 匹配；`root` 用来圈定 monorepo 里的子应用。最长匹配胜出。键名就是 frontmatter 里 `repo:` 的取值。
-- `watched` 是 Stop 提醒监视的目录。`vault init` 会按项目布局自动检测。
-- `generic_dirs` 在内置的容器目录列表之外追加：这些目录不允许被某篇笔记整个认领。
-- `tidy` 是维护信号的阈值。
-- `_meta/local.md` 若存在，就是这个 vault 自己的规则（分支名、changelog 格式、数据隐私写法）。每个 skill 都会读它。
-
-环境变量覆盖：`VAULT_ROOT`（指定 vault）、`VAULT_WATCHED`、`VAULT_WINDOW_HOURS`、`VAULT_STOP_NUDGE=quiet`（Stop 提醒只给你看，不进 agent 的上下文）。
-
-## 团队协作
-
-vault 是独立的 git 仓库，像共享代码一样共享它：
-
-- 每个人安装插件并运行 `/lightkeeper:init --clone <url> --repo <checkout>`，所有人的 hook 都指向同一张地图。
-- 同事推送的代码没有 hook 跟着，地图会漂移。`vault sync` 报告自上次对账以来每个仓库落地了什么，按拥有这些文件的笔记分组；`vault-sync` skill 负责补齐。只有笔记更新之后才推进游标。
-- `vault init --git-hook` 装的 `post-merge` 和 `pre-push` 钩子会打印 vault 落后分支多少。它们从不拦截，不用 Claude 的同事也能看到。
-- `vault init --backup-remote <url>` 让每次 vault 提交自动推送，单机 vault 永远只落后备份一次提交。
-- **PR 评论机器人。** 在代码仓库的 workflow 里加一行 `uses: Light5566/claude-lightkeeper/action@main`，每个 pull request 都会收到一条评论：改动的文件归哪些笔记管、这些笔记还连着什么以及为什么、它们的第一条 Gotcha，以及哪些文件没有笔记认领。只提醒，不拦截。配置见 [action/README.md](action/README.md)。
-
-## 让地图保持诚实
-
-`vault check --write` 把维护信号写进 `_meta/Attention.md`：
-
-| 信号 | 规则 |
-|---|---|
-| consolidate | 超过 `max_words` 词或 `max_gotchas` 条 Gotcha |
-| re-verify | `updated` 比 `stale_days` 还旧，**并且**此后至少 `churn_commits` 次提交碰过这篇笔记的文件 |
-| promote | 文件一直在变的存根笔记 |
-| path rot | *Where it lives* 里的路径在任何 worktree 和已提交的树里都不存在 |
-| link rot | 链接理由里提到的 `Class::method` 在代码里找不到 |
-
-会话引导每天提一次数量。`/lightkeeper:tidy` 负责处理：重组并去重 Gotchas 而不丢掉任何一个陷阱，先重读过期笔记背后的 diff 再确认或修正，从代码把存根写完整。
-
-`_meta/Vault Changelog.md` 每次 `--write` 都从 vault 自己的 git 历史生成，所以"地图什么时候学到了什么"永远不用手动维护。`World.canvas` 同样会重新生成：每个领域一个分组，模块在里面，跨领域的连接带着理由。
-
 ## 兼容性
 
 | | |
 |---|---|
 | Claude Code（CLI、桌面端、IDE 扩展） | hook、skill、命令和 CLI |
-| Hermes Agent | hook、skill、流程和 CLI，通过仓库根目录的适配层；见下文 |
-| Codex | hook、skill 和 CLI，通过 `codex/` 里的适配层；见下文 |
+| Hermes Agent | hook、skill、流程和 CLI，通过仓库根目录的适配层；见 [docs/agents.zh.md](docs/agents.zh.md) |
+| Codex | hook、skill 和 CLI，通过 `codex/` 里的适配层；见 [docs/agents.zh.md](docs/agents.zh.md) |
 | 其他 agent（Cursor、Gemini CLI 等） | `vault` CLI、SKILL.md 文件，以及 `vault export --agents-md` 打印的、给它们的 AGENTS.md 用的一段说明 |
 | macOS、Linux | 已测试 |
 | Windows | 未测试；hook 直接调用 Python，WSL 或 Git Bash 应该可以 |
@@ -226,56 +174,10 @@ vault 是独立的 git 仓库，像共享代码一样共享它：
 | Python | 3.9 或更新，只用标准库，不需要 pip 安装任何东西 |
 | 语言和框架 | 任意；`vault init` 识别项目布局，其余交给 `vault.json` |
 
-### Hermes Agent
+## 更多
 
-仓库根目录同时也是一个 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 插件（`plugin.yaml`、`__init__.py`）。安装、启用，然后用同样的方式建 vault：
-
-```
-hermes plugins install Light5566/claude-lightkeeper
-hermes plugins enable lightkeeper
-python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
-```
-
-注册表文件沿用历史名字 `~/.claude/vaults`，不需要装 Claude Code。你得到的东西分三层：
-
-- **CLI 兼容。** `vault` 在任何 shell 里都能用。`--install-cli` 把它放进 PATH，启动器会找到 Hermes 的安装目录。
-- **工作流集成。** 三个 skill 和五个流程都是 Hermes skill：`lightkeeper:knowledge-vault`、`lightkeeper:vault-sync`、`lightkeeper:vault-tidy`、`lightkeeper:init`、`lightkeeper:seed`、`lightkeeper:tidy`、`lightkeeper:trace`、`lightkeeper:release`。首轮引导会列出它们，agent 用 `skill_view` 加载。
-- **自动生命周期。** 适配层通过 Hermes 的插件 hook，运行与 Claude Code 完全相同的 hook 脚本。接了哪些、哪里不同：
-
-| 行为 | 在 Hermes 里 |
-|---|---|
-| 会话引导 | 附在新会话的第一条消息后（`pre_llm_call`）；续接的会话不触发，上下文压缩后也不会再发 |
-| 提示词提示 | 附在触发它的那条消息后 |
-| 编辑指针 | 在编辑之后，不是之前：作为 `lightkeeper` 字段放在 `write_file` / `patch` 的 JSON 结果里送达（`transform_tool_result`）。agent 由此知道刚改的文件属于哪篇笔记，继续之前先读它的 Gotchas。在任何编辑之前就点名笔记的，是提示词提示和会话引导 |
-| Stop 提醒 | 走 Hermes 的 verify 门（`pre_verify`）：在 Hermes 看到文件编辑的那一轮，提醒会作为一条合成的用户消息回来，每个回答最多一次，agent 继续干活；没有文件编辑的轮次不触发 |
-| 给你的通知 | 会话结束时（`/new`、退出）再显示一次提醒，不会进入模型 |
-
-需要会话的工作目录是被覆盖的 checkout，并使用本地终端后端。和 Claude Code 一样，什么都不会被拦截。Lightkeeper 不是 memory provider，所以能和 Hermes 自带的记忆以及任何记忆插件并存。要求 Hermes 0.22 或更新：已在 stable 0.22.2 的 `hermes chat -q` 模式用真实模型测试，覆盖 `patch` 和 `write_file`、编辑指针、verify 门提醒、笔记更新和会话结束通知；消息网关、交互式多轮、上下文压缩后的行为、同一 gateway 上的并发会话，以及 host-unified 的 main 构建尚未验证。开发时，`bash check.sh` 用一个假的插件上下文驱动适配层；在装了 Hermes 的机器上跑 `hermes plugins validate .` 和 `hermes plugins doctor . --ci`。
-
-### Codex
-
-Codex 从同一个 marketplace 安装插件，并通过 `codex/` 里的一个小适配层运行 Lightkeeper 的 hook：
-
-```
-codex plugin marketplace add Light5566/claude-lightkeeper
-codex plugin add lightkeeper@claude-lightkeeper
-```
-
-在终端里创建 vault（如果已经用 Claude Code 建过就跳过）。`<version>` 是 Codex 为所装版本建的文件夹：
-
-```
-python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
-```
-
-| 行为 | 在 Codex 里 |
-|---|---|
-| 会话引导 | 和 Claude Code 一样，包括压缩上下文后的简短提醒 |
-| 提示词匹配 | 和 Claude Code 一样 |
-| 文件指引 | `apply_patch` 新增、修改、删除或移动的每个文件都会提示。agent 和补丁的结果一起读到它，所以是在编辑之后马上知道文件归哪篇笔记，和 Hermes 一样。Codex 通过 shell 读文件，所以没有读取时的提示：在任何编辑之前就点名笔记的，是提示词匹配和会话引导 |
-| Stop 提醒 | 显示给你，并且每个会话一次作为下一条提示发回给 agent：Codex 的 Stop hook 没有上下文通道，适配层用 `decision: block`，把提醒作为理由 |
-| Skill | `knowledge-vault`、`vault-sync` 和 `vault-tidy`。五个斜杠命令是 Claude Code 的；在 Codex 里用 `vault` 命令行 |
-
-安装后第一次启动 Codex TUI 时，它会请你审核插件的 hook：四个都要信任。在那里被关掉的 hook 会一直关着，直到你在 `/hooks` 里重新打开。已在 Codex CLI 0.166.0-alpha.6 的 `codex exec` 模式用真实模型测试，覆盖会话引导、带术语表词条的提示词匹配、`apply_patch` 上的文件指引，以及 Stop 的两条路径：笔记已更新时保持安静；否则提醒发回给 agent，由它更新笔记或说明为什么不需要，下一次 Stop 保持安静。交互式 TUI 会话和上下文压缩后的行为尚未验证。开发时，`bash check.sh` 用假的 payload 驱动适配层。
+- **[配置、团队协作、让地图保持诚实](docs/guide.zh.md)：** `vault.json`、和同事共用一个 vault、PR 评论机器人、分支上的笔记，以及指出哪些笔记已经过时的检查。
+- **[Hermes Agent 和 Codex](docs/agents.zh.md)：** 安装命令，以及每个里面具体接了什么。
 
 ## 刻意不做的事
 

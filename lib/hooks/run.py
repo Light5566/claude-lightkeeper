@@ -4,7 +4,10 @@
 Reads the hook payload from stdin, finds the vault that covers the project
 (CLAUDE_PROJECT_DIR, then the payload's cwd), loads its config and runs the
 named hook's run(payload). Silent no-op when no vault covers the project, when
-the vault is unusable, or on any error. Always exits 0 and never prints
+the vault is unusable, or on any error. One exception to the silence: the first
+session in a git checkout that no vault covers gets a one-line message for the
+user, once per checkout ever, saying how to create one (LIGHTKEEPER_QUIET=1
+turns it off). Always exits 0 and never prints
 anything except the hook's own single JSON object.
 
 Each run is also counted in the session state (runs, and runs that told the
@@ -46,6 +49,31 @@ def record(hook, payload, said):
     _util.save_state(session, state)
 
 
+def no_vault_notice(vaultlib, cwd, payload):
+    """Once per checkout: tell the user the plugin is installed but has no map here."""
+    if os.environ.get("LIGHTKEEPER_QUIET") or payload.get("source") in ("resume", "compact"):
+        return
+    top, _origin = vaultlib.project_of(cwd)
+    if not top:
+        return
+    seen_path = Path(str(vaultlib.REGISTRY) + "-hinted.json")
+    try:
+        seen = json.loads(seen_path.read_text())
+        seen = seen if isinstance(seen, list) else []
+    except (OSError, ValueError):
+        seen = []
+    if top in seen:
+        return
+    try:
+        seen_path.parent.mkdir(parents=True, exist_ok=True)
+        seen_path.write_text(json.dumps(seen + [top]))
+    except OSError:
+        return  # can't remember it was shown: stay quiet rather than repeat it every session
+    print(json.dumps({"systemMessage": (
+        "Lightkeeper is installed, but no map covers this repo yet. Run /lightkeeper:init to "
+        "create one (no arguments needed). Shown once per repo; LIGHTKEEPER_QUIET=1 hides it.")}))
+
+
 def main():
     hook = sys.argv[1] if len(sys.argv) > 1 else ""
     try:
@@ -63,6 +91,8 @@ def main():
         import vaultlib
         cwd = os.environ.get("CLAUDE_PROJECT_DIR") or payload.get("cwd") or os.getcwd()
         if not vaultlib.init(cwd=cwd):
+            if hook == "session_start":
+                no_vault_notice(vaultlib, cwd, payload)
             return
         out = io.StringIO()
         with contextlib.redirect_stdout(out):

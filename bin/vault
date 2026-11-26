@@ -10,8 +10,11 @@
     vault release vX.Y.Z [--since REF]     draft data for a release note
     vault export --html FILE               self-contained interactive map
     vault export --agents-md               a block for AGENTS.md, printed, never written
-    vault init <path> --repo <checkout>    scaffold and register a new vault
+    vault doctor                           is it set up and working here? a fix beside each problem
+    vault init                             inside a git checkout: a vault for this repo, all defaults
+    vault init <path> --repo <checkout>    scaffold and register a new vault, your choices
     vault init --install-cli               (re)install this launcher into ~/.local/bin
+    vault init --forget                    stop using a vault here (the folder stays)
 
 Finds the installed plugin through ~/.claude/plugins/installed_plugins.json
 (Claude Code), ~/.hermes/plugins (Hermes Agent) or ~/.codex/plugins/cache
@@ -27,7 +30,7 @@ from pathlib import Path
 CMDS = {
     "find": "find.py", "check": "check.py", "sync": "sync.py", "status": "status.py",
     "log": "log.py", "release": "release.py", "export": "export_html.py",
-    "canvas": "canvas.py", "init": "init.py",
+    "canvas": "canvas.py", "init": "init.py", "doctor": "doctor.py",
 }
 
 

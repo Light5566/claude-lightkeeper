@@ -2,6 +2,23 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.11.0 - 2026-11-26
+
+The first five minutes. A survey of eight similar tools and a walk through our own first run found too many decisions before the first note, silence when nothing was set up, and no way to check or undo the setup.
+
+### Added
+- **`/lightkeeper:init` with no arguments.** From a session inside your project it covers the repo you are in, names the vault after its folder, puts it in `~/vaults/<name>` and installs the `vault` command. It shows those choices and asks once. `vault init --plan` prints them and changes nothing; `--no-cli` skips the launcher. Every explicit form (`<path> --name --repo`, `--clone`, `--adopt`, `--install-cli` alone) works as before.
+- **`vault doctor`.** One screen: Python and git, the plugin and its version, the registry, whether this folder is covered and by which vault, whether any note owns code, whether `vault` is on PATH, and when the hooks last ran. A fix is printed beside each problem, and it exits 1 when something needs fixing.
+- **`vault init --forget [<vault>]`.** Stops using a vault here: removes its registry line and the report-only git hooks Lightkeeper installed. The vault folder is never deleted; `--adopt` brings it back.
+- **A message when nothing is set up.** The first session in a git checkout that no vault covers shows the user one line saying to run `/lightkeeper:init`, once per checkout ever. `LIGHTKEEPER_QUIET=1` hides it.
+- **A line when the vault is empty.** Until a module or integration note exists, the session primer says the file pointer has nothing to point at and to run `/lightkeeper:seed`.
+
+### Changed
+- **The slash commands no longer need `vault` on your PATH.** seed, tidy, trace and release call the plugin's own launcher, so they work straight after install.
+- **One order everywhere: init, seed, done.** The file pointer works in the same session once notes own files, so no restart is needed; the session primer shows from the next session. The README, the init command and init's last line now agree, and init offers to seed straight away.
+- **README.** The first screen is three lines to a working map and says nothing is written into your repo. Configuration, teams, keeping the map honest and branch notes moved to `docs/guide.md`; Hermes Agent and Codex to `docs/agents.md`. 3,483 words became 2,184. Same in 中文.
+- The Hermes and Codex install lines use the zero-argument `vault init`.
+
 ## 2.10.0 - 2026-11-25
 
 ### Added

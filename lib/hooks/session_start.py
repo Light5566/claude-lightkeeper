@@ -5,8 +5,10 @@ resume (the primer is already in the transcript); after a compaction
 (source "compact") it sends a short reminder instead of the full primer, names
 the notes surfaced before the compaction and re-arms the prompt hints and the
 file pointer for them: their text left the context with the summary.
-Once per 24h it also surfaces the maintenance signals from _meta/status.json."""
+Once per 24h it also surfaces the maintenance signals from _meta/status.json.
+A vault with no module or integration notes yet gets a line saying to seed it."""
 import json
+import os
 import time
 from pathlib import Path
 
@@ -48,6 +50,17 @@ def attention_line():
             "(details: _meta/Attention.md)." % (count, (" (%s)" % top) if top else ""))
 
 
+def has_code_notes():
+    """True once any module or integration note exists. A directory listing, no index load."""
+    for folder in ("2 Modules", "4 Integrations"):
+        try:
+            if any(n.endswith(".md") for n in os.listdir(vaultlib.VAULT_ROOT / folder)):
+                return True
+        except OSError:
+            pass
+    return False
+
+
 def run(payload):
     source = payload.get("source")
     if source == "resume":
@@ -80,6 +93,10 @@ def run(payload):
         "affected note (knowledge-vault skill): that is part of the definition of done. "
         "Learned a trap while debugging? Write the Gotcha even if no file changed.",
     ]
+    if not has_code_notes():
+        lines.append("This vault has no module notes yet, so the file pointer has nothing to point "
+                     "at. Tell the user once: run /lightkeeper:seed to propose the first notes "
+                     "from the code (nothing is written until they approve).")
     extra = attention_line()
     if extra:
         lines.append(extra)

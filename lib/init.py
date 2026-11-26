@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """vault init: scaffold and register a knowledge vault.
 
+    vault init                       # inside a git checkout: a vault for this repo, all defaults
+    vault init --plan                # print what the line above would do, change nothing
     vault init <path> --name NAME --repo <checkout> [--repo ...] [options]
     vault init --clone <url> [<path>] [--repo <checkout> ...] [options]
     vault init --adopt <existing-vault> --name NAME [--repo <checkout> ...] [options]
     vault init --install-cli
+    vault init --forget [<vault>]    # stop using a vault here: unregister it, remove our git hooks
+
+With no path, --clone or --adopt, the vault covers the checkout you are in, is
+named after its folder, goes to ~/vaults/<name>, and the `vault` launcher is
+installed (--no-cli skips that).
 
 Options:
     --repo <checkout>      a local checkout the vault covers (repeatable). Its git
@@ -16,7 +23,7 @@ Options:
     --no-git               do not `git init` / commit the new vault
 
 A fresh vault gets the scaffold (Home, conventions, templates, Obsidian config,
-Bases views), the eight folders, one `8 Repos/<name>.md` stub per checkout,
+Bases views), the nine folders, one `8 Repos/<name>.md` stub per checkout,
 `_meta/vault.json` (what the hooks route on) and `_meta/sync-state.json`
 (cursors for `vault sync`), and is registered in ~/.claude/vaults so the hooks
 find it from any covered checkout. Python 3.9, stdlib only.
@@ -323,7 +330,8 @@ def clone(url, path, repos):
 
 def parse(argv):
     opts = {"path": None, "name": None, "repos": [], "install_cli": False, "git_hook": False,
-            "backup": None, "no_git": False, "clone": None, "adopt": None}
+            "backup": None, "no_git": False, "clone": None, "adopt": None,
+            "plan": False, "no_cli": False, "forget": False}
     it = iter(argv)
     for a in it:
         if a == "--name":
@@ -338,6 +346,12 @@ def parse(argv):
             opts["backup"] = next(it, None)
         elif a == "--no-git":
             opts["no_git"] = True
+        elif a == "--plan":
+            opts["plan"] = True
+        elif a == "--no-cli":
+            opts["no_cli"] = True
+        elif a == "--forget":
+            opts["forget"] = True
         elif a == "--clone":
             opts["clone"] = next(it, None)
         elif a == "--adopt":
@@ -352,8 +366,88 @@ def parse(argv):
     return opts
 
 
+def defaults(opts):
+    """Fill path, name and repo from the checkout we are in. Returns an error line or None."""
+    cwd = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    top, _origin = vaultlib.project_of(cwd)
+    if not top and not opts["repos"]:
+        return ("not inside a git checkout: run this from the project the vault should cover, "
+                "or pass <path> --repo <checkout>")
+    if not opts["repos"]:
+        found = vaultlib.resolve_vault(cwd=cwd)
+        if found and found[2]:
+            return "this checkout is already covered by %s (see: vault status)" % found[0]
+        opts["repos"] = [top]
+    if not opts["name"]:
+        opts["name"] = Path(os.path.expanduser(opts["repos"][0])).resolve().name
+    opts["path"] = str(Path.home() / "vaults" / vaultlib.slug(opts["name"]))
+    if not opts["no_cli"]:
+        opts["install_cli"] = True
+    return None
+
+
+def remove_git_hooks(checkouts):
+    for c in checkouts:
+        common = git(c, "rev-parse", "--git-common-dir")
+        if not common:
+            continue
+        hooks = Path(c) / common / "hooks" if not os.path.isabs(common) else Path(common) / "hooks"
+        for name in ("post-merge", "pre-push"):
+            target = hooks / name
+            try:
+                if "# claude-vault git hook body" in target.read_text():
+                    target.unlink()
+                    print("  %s: %s hook removed" % (Path(c).name, name))
+            except OSError:
+                pass
+
+
+def forget(path):
+    """Unregister a vault and remove the git hooks we installed. The folder stays."""
+    if path:
+        dest = Path(os.path.expanduser(path)).resolve()
+    else:
+        found = vaultlib.resolve_vault(cwd=os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
+        if not found:
+            sys.exit("no vault covers this folder; name one: vault init --forget <vault>")
+        dest = Path(found[0]).resolve()
+    reg = vaultlib.REGISTRY
+    try:
+        lines = reg.read_text().splitlines()
+    except OSError:
+        lines = []
+    kept = [l for l in lines if not l.strip() or l.strip().startswith("#")
+            or Path(os.path.expanduser(l.strip())).resolve() != dest]
+    if len(kept) == len(lines):
+        print("%s was not registered in %s" % (dest, reg))
+    else:
+        reg.write_text("\n".join(kept) + ("\n" if kept else ""))
+        print("unregistered %s (the hooks no longer use it)" % dest)
+    try:
+        state = json.loads((dest / "_meta" / "sync-state.json").read_text())
+    except (OSError, ValueError):
+        state = {}
+    remove_git_hooks([os.path.expanduser(t["path"]) for t in state.get("targets", []) if t.get("path")])
+    print("the folder is untouched; bring it back with: vault init --adopt %s" % dest)
+    return 0
+
+
 def main(argv):
     opts = parse(argv)
+    if opts["forget"]:
+        return forget(opts["path"])
+    cli_only = opts["install_cli"] and not (opts["repos"] or opts["name"] or opts["git_hook"] or opts["plan"])
+    if not (opts["path"] or opts["clone"] or opts["adopt"] or cli_only):
+        err = defaults(opts)
+        if err:
+            print(err)
+            return 2
+    if opts["plan"]:
+        print("would create the vault %s, named \"%s\", covering %s%s" % (
+            opts["path"] or opts["adopt"] or opts["clone"], opts["name"] or "",
+            ", ".join(str(Path(os.path.expanduser(r)).resolve()) for r in opts["repos"]) or "no repo",
+            "; and install the vault command in ~/.local/bin" if opts["install_cli"] else ""))
+        return 0
     repos = [detect_repo(r) for r in opts["repos"] if r]
     dest = None
     if opts["clone"]:
@@ -378,9 +472,10 @@ def main(argv):
             install_git_hooks([c for _k, _e, c, _h in repos])
         if opts["backup"]:
             backup_remote(dest, opts["backup"])
-        print("\nnext: open %s in Obsidian (Open folder as vault), then start a new agent session "
-              "inside a covered checkout — the session primer should appear. Seed the first "
-              "notes with /lightkeeper:seed." % dest)
+        print("\nnext: seed the first notes with /lightkeeper:seed (the file pointer works as soon "
+              "as notes own files, in this session too; the session primer shows from your next "
+              "session). To look at the map: open %s in Obsidian (Open folder as vault), or "
+              "`vault export --html map.html`. Check the setup any time with `vault doctor`." % dest)
     return 0
 
 

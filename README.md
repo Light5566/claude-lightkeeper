@@ -13,9 +13,10 @@ A coding agent rediscovers your codebase every session, and a long session loses
 ```
 /plugin marketplace add Light5566/claude-lightkeeper
 /plugin install lightkeeper@claude-lightkeeper
+/lightkeeper:init
 ```
 
-That is the Claude Code install; the rest of the setup is in [Install, from zero](#install-from-zero). For the other two, see [Hermes Agent](#hermes-agent) and [Codex](#codex).
+Three lines in Claude Code, the third from inside your project. It makes a map for the repo you are in, then offers to write the first notes from your code. Nothing is written into your repo: the map lives in `~/vaults/<name>`. Using [Hermes Agent or Codex](docs/agents.md)? Their install lines are there.
 
 Lightkeeper is a Claude Code plugin, and runs as a Hermes Agent and a Codex plugin too. It keeps an Obsidian-compatible markdown map of how your system works (modules, flows, integrations, platform traps, decisions, releases, the words it uses in its own way) *outside* the code repo, and wires five behaviours into the agent so the map stays true:
 
@@ -66,11 +67,9 @@ Use a memory tool *and* this. They answer different questions.
 
 The cost: a map update is a separate commit in a separate repo, so git cannot couple them. That is exactly what the hooks and the `vault check` ritual are for.
 
-One map for every branch has a catch: a note written on a feature branch is also what an agent on `main` reads. So the hooks remember which branch a note was last edited on. When the agent opens a file whose note was last written on a branch the current checkout doesn't contain, the file pointer says so and tells it to check the note against the code in front of it. Once the branch is merged, the warning stops by itself. `vault status` lists these notes. The record is kept per machine, beside the vault registry, and nothing is written into the vault or the repo.
-
 ## Install, from zero
 
-**You need:** [Claude Code](https://code.claude.com), git, and Python 3.9 or newer on your PATH (macOS and most Linux distributions ship it). Obsidian is optional but recommended: get it at [obsidian.md/download](https://obsidian.md/download) or `brew install --cask obsidian`.
+**You need:** [Claude Code](https://code.claude.com), git, and Python 3.9 or newer on your PATH (macOS and most Linux distributions ship it). Obsidian is optional: get it at [obsidian.md/download](https://obsidian.md/download) or `brew install --cask obsidian`.
 
 1. **Install the plugin** inside Claude Code:
 
@@ -81,13 +80,13 @@ One map for every branch has a catch: a note written on a feature branch is also
 
    or from a shell: `claude plugin marketplace add Light5566/claude-lightkeeper && claude plugin install lightkeeper@claude-lightkeeper`.
 
-2. **Create a vault** for one or more checkouts. Run this in any Claude Code session:
+2. **Create the map**, from a session inside your project:
 
    ```
-   /lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
+   /lightkeeper:init
    ```
 
-   This scaffolds the vault (folders, conventions, templates, Obsidian config, Bases views), writes `_meta/vault.json` describing the repos it covers, registers it in `~/.claude/vaults`, installs the `vault` command into `~/.local/bin`, and adds report-only `post-merge` and `pre-push` hooks to the checkout.
+   With no arguments it covers the repo you are in, names the vault after its folder, puts it in `~/vaults/<name>` and installs the `vault` command into `~/.local/bin`. It shows you those choices and asks once before doing anything. To choose yourself: `/lightkeeper:init ~/vaults/myapp --name "My App" --repo ~/code/myapp --repo ~/code/myapp-web --git-hook`.
 
 3. **Seed the first notes** from the code:
 
@@ -95,16 +94,18 @@ One map for every branch has a catch: a note written on a feature branch is also
    /lightkeeper:seed
    ```
 
-   Claude proposes domains and up to 60 module stubs with real file paths, asks, then writes them. From that moment the pre-edit pointer fires on the first edit.
+   Claude proposes domains and up to 60 module stubs with real file paths, asks, then writes them. From that moment the file pointer fires, in this session too. The session primer shows from your next session.
 
-4. **Open it in Obsidian:** *Open folder as vault* → pick `~/vaults/myapp`. The graph colours, the Properties pane and the Bases views are preconfigured.
+That's it. Three things worth knowing:
 
-5. **Restart Claude Code inside the checkout.** The session primer appears. You are done.
+- **See the map:** open the vault folder in Obsidian (*Open folder as vault*), or run `vault export --html map.html` for a single page you can open in a browser.
+- **Check it works:** `vault doctor` checks the setup on one screen and prints a fix beside each problem. If you install the plugin and never create a map, the first session in a repo tells you once.
+- **Turn it off:** `vault init --forget` stops using the vault in this project and removes the git hooks it installed. The vault folder stays where it is.
 
 Working on a project that already has a vault? Clone and register it in one step:
 
 ```
-/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --install-cli --git-hook
+/lightkeeper:init --clone git@github.com:your-team/myapp-vault.git --repo ~/code/myapp --git-hook
 ```
 
 Have an existing Obsidian vault you want to grow into this? `vault init --adopt ~/my-vault --name "My App" --repo ~/code/myapp` writes the config and registers it without touching your notes; only notes that carry a `type:` are linted, so you can adopt gradually.
@@ -147,7 +148,10 @@ vault sync [target] [--advance] what landed on the repos since the vault last ca
 vault log <note>                that note's git history
 vault export --html <file>      a self-contained interactive map
 vault export --agents-md        a block for AGENTS.md: where the map is, how to search it, which note owns which code
-vault init ...                  scaffold, clone or adopt a vault
+vault doctor                    is it set up and working here? a fix beside each problem
+vault init                      inside a git checkout: a vault for this repo, all defaults
+vault init <path> --repo ...    scaffold, clone (--clone) or adopt (--adopt) a vault, your choices
+vault init --forget             stop using a vault here; the folder stays
 ```
 
 Every command takes `--vault <path>`; without it, the vault covering the current directory is used.
@@ -156,69 +160,13 @@ Every command takes `--vault <path>`; without it, the vault covering the current
 
 `vault check` catches unresolved links, duplicate note names, bare links, container-directory claims, off-schema frontmatter, orphans, stale notes, and anything that looks like a secret or personal data (email addresses, long digit runs, API-key shapes, private keys). Run it with `--write` before every vault commit.
 
-## Configuration
-
-`_meta/vault.json` in the vault:
-
-```json
-{
-  "name": "My App",
-  "repos": {
-    "myapp":     {"remote": "github.com/acme/myapp", "watched": ["app", "routes", "database/migrations"],
-                  "production_ref": "origin/main", "version_log": "CHANGELOG.md"},
-    "myapp-web": {"remote": "github.com/acme/myapp-web", "watched": ["app", "components", "src"],
-                  "production_ref": "origin/main"},
-    "local-only": {"path": "~/code/experiment", "watched": ["src"]},
-    "ops":        {"remote": "github.com/acme/monorepo", "root": "apps/ops", "watched": ["src"]}
-  },
-  "generic_dirs": ["app/Services"],
-  "noise_files": ["TODO.md"],
-  "stop_window_hours": 6,
-  "tidy": {"max_words": 4000, "max_gotchas": 20, "stale_days": 60, "churn_commits": 5}
-}
-```
-
-- `repos` is what the hooks route on: a checkout matches by `remote` substring (any URL form) or by `path`; `root` scopes a monorepo sub-app. Longest match wins. The key is the value of the `repo:` frontmatter field.
-- `watched` are the directories the Stop reminder watches. `vault init` detects them from the layout.
-- `generic_dirs` extends the built-in list of container directories a note may never own wholesale.
-- `tidy` sets the attention thresholds.
-- `_meta/local.md`, if present, holds this vault's own rules (branch names, changelog format, data-privacy wording). Every skill reads it.
-
-Environment overrides: `VAULT_ROOT` (use this vault), `VAULT_WATCHED`, `VAULT_WINDOW_HOURS`, `VAULT_STOP_NUDGE=quiet` (keep the Stop reminder out of the agent's context, show it only to you).
-
-## Teams
-
-The vault is its own git repo. Share it the way you share code:
-
-- Each person installs the plugin and runs `/lightkeeper:init --clone <url> --repo <checkout>`. Their hooks now point at the same map.
-- Colleagues' pushes arrive with no hook attached, so the map drifts. `vault sync` reports everything that landed on each repo since the vault last caught up, grouped by the notes that own the changed files, and the `vault-sync` skill walks the catch-up. Advance the cursor only after the notes are updated.
-- The `post-merge` and `pre-push` git hooks that `vault init --git-hook` installs print how far the vault is behind the branch. They never block, and they work for teammates who do not use Claude.
-- `vault init --backup-remote <url>` makes every vault commit push itself, so a one-machine vault is never more than a commit behind its backup.
-- **The PR comment bot.** `uses: Light5566/claude-lightkeeper/action@main` in a code repo's workflow comments on every pull request with the notes that own its changed files, what else each of those notes connects to and why, its first Gotcha, and the files that match no note. Advisory, never blocks. Setup in [action/README.md](action/README.md).
-
-## Keeping the map honest
-
-`vault check --write` computes maintenance signals into `_meta/Attention.md`:
-
-| Signal | Rule |
-|---|---|
-| consolidate | more than `max_words` words or `max_gotchas` Gotcha bullets |
-| re-verify | `updated` older than `stale_days` **and** at least `churn_commits` commits touched the note's files since |
-| promote | a stub whose files keep changing |
-| path rot | a *Where it lives* path that exists in no worktree or committed tree |
-| link rot | a link reason names a `Class::method` that no file defines |
-
-The session primer mentions the count once a day. `/lightkeeper:tidy` works the list: it regroups and dedupes Gotchas without dropping a single trap, re-reads the diff behind a stale note before confirming or fixing it, and promotes stubs from the code.
-
-`_meta/Vault Changelog.md` is derived from the vault's git history on every `--write`, so the history of what the map learned, and when, is never hand-kept. `World.canvas` is regenerated the same way: one group per domain, modules inside, cross-domain links with their reasons.
-
 ## Compatibility
 
 | | |
 |---|---|
 | Claude Code (CLI, desktop, IDE extensions) | hooks, skills, commands and the CLI |
-| Hermes Agent | hooks, skills, procedures and the CLI, through the adapter at the repo root; see below |
-| Codex | hooks, skills and the CLI, through the adapter in `codex/`; see below |
+| Hermes Agent | hooks, skills, procedures and the CLI, through the adapter at the repo root; see [docs/agents.md](docs/agents.md) |
+| Codex | hooks, skills and the CLI, through the adapter in `codex/`; see [docs/agents.md](docs/agents.md) |
 | Other agents (Cursor, Gemini CLI, …) | the `vault` CLI, the SKILL.md files, and a block for their AGENTS.md from `vault export --agents-md` |
 | macOS, Linux | tested |
 | Windows | untested; hooks call Python directly, so WSL or Git Bash should work |
@@ -226,56 +174,10 @@ The session primer mentions the count once a day. `/lightkeeper:tidy` works the 
 | Python | 3.9 or newer, standard library only, nothing to pip install |
 | Languages and frameworks | any; `vault init` detects the layout, and `vault.json` covers the rest |
 
-### Hermes Agent
+## Going further
 
-The repo root is also a [Hermes Agent](https://github.com/NousResearch/hermes-agent) plugin (`plugin.yaml`, `__init__.py`). Install it, enable it, then create a vault the same way:
-
-```
-hermes plugins install Light5566/claude-lightkeeper
-hermes plugins enable lightkeeper
-python3 ~/.hermes/plugins/lightkeeper/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
-```
-
-The registry file keeps its historical name, `~/.claude/vaults`; Claude Code is not needed. What you get, in three tiers:
-
-- **CLI compatible.** `vault` works from any shell. `--install-cli` puts it on your PATH, and the launcher finds the Hermes install.
-- **Workflow integration.** The three skills and the five procedures are Hermes skills: `lightkeeper:knowledge-vault`, `lightkeeper:vault-sync`, `lightkeeper:vault-tidy`, `lightkeeper:init`, `lightkeeper:seed`, `lightkeeper:tidy`, `lightkeeper:trace` and `lightkeeper:release`. The first-turn primer names them, and the agent loads one with `skill_view`.
-- **Automatic lifecycle.** The adapter runs the same hook scripts Claude Code runs, through Hermes's plugin hooks. Exactly what is wired, and where it differs:
-
-| Behaviour | In Hermes |
-|---|---|
-| Session primer | appended to your first message in a new session (`pre_llm_call`); not on a continued session, and not again after a context compaction |
-| Prompt hints | appended to the message that triggered them |
-| Edit pointer | after the edit, not before: it arrives as a `lightkeeper` field inside the JSON result of `write_file` or `patch` (`transform_tool_result`). The agent learns which note owns the file it just changed and reads its Gotchas before going further. What names notes before any edit is the prompt hint and the primer |
-| Stop reminder | Hermes's verify gate (`pre_verify`): on a turn in which Hermes saw file edits, the reminder comes back as a synthetic user turn, once per answer, and the agent keeps working; a turn without file edits does not trigger it |
-| Notice to you | the reminder is shown once more when the session ends (`/new`, quit), never to the model |
-
-It needs a session whose working directory is a covered checkout, and the local terminal backend. Nothing blocks, as in Claude Code. Lightkeeper is not a memory provider, so it sits beside Hermes's own memory and any memory plugin. Hermes 0.22 or newer: tested with a real model on stable 0.22.2 in `hermes chat -q` mode, covering `patch` and `write_file`, the edit pointer, the verify-gate reminder, the note update and the session-end notice; not yet verified are the messaging gateways, interactive multi-turn sessions, turns after a context compaction, concurrent sessions on one gateway, and host-unified main builds. For development, `bash check.sh` drives the adapter with a fake plugin context; on a machine with Hermes, run `hermes plugins validate .` and `hermes plugins doctor . --ci`.
-
-### Codex
-
-Codex installs plugins from the same marketplace, and runs Lightkeeper's hooks through a small adapter in `codex/`:
-
-```
-codex plugin marketplace add Light5566/claude-lightkeeper
-codex plugin add lightkeeper@claude-lightkeeper
-```
-
-Create a vault from a shell, or skip this if you already have one from Claude Code. `<version>` is the folder Codex made for the version it installed:
-
-```
-python3 ~/.codex/plugins/cache/claude-lightkeeper/lightkeeper/<version>/bin/vault init ~/vaults/myapp --name "My App" --repo ~/code/myapp --install-cli --git-hook
-```
-
-| Behaviour | In Codex |
-|---|---|
-| Session primer | as in Claude Code, including the short reminder after a compaction |
-| Prompt hints | as in Claude Code |
-| File pointer | for every file an `apply_patch` adds, updates, deletes or moves. The agent reads it with the patch's result, so it learns the owning note just after the edit, as in Hermes. Codex reads files through the shell, so there is no read pointer: what names notes before any edit is the prompt hint and the primer |
-| Stop reminder | shown to you, and once per session sent back to the agent as its next prompt: Codex's Stop hook has no context channel, so the adapter uses `decision: block` with the reminder as the reason |
-| Skills | `knowledge-vault`, `vault-sync` and `vault-tidy`. The five slash commands are Claude Code's; in Codex, use the `vault` CLI |
-
-The first time the Codex TUI starts after the install, it asks you to review the plugin's hooks: trust all four. A hook switched off there stays off until you switch it back on in `/hooks`. Tested with a real model on Codex CLI 0.166.0-alpha.6 in `codex exec` mode, covering the session primer, prompt hints with a glossary term, the file pointer on `apply_patch`, and both Stop paths: quiet once the note is updated; otherwise the reminder goes back to the agent, which updates the note or says why not, and the next Stop stays quiet. Not yet verified: interactive TUI sessions and turns after a context compaction. For development, `bash check.sh` drives the adapter with fake payloads.
+- **[Configuration, teams and keeping the map honest](docs/guide.md):** `vault.json`, sharing a vault with teammates, the PR comment bot, branch notes, and the checks that say which notes have gone stale.
+- **[Hermes Agent and Codex](docs/agents.md):** install lines and exactly what is wired in each.
 
 ## Not included, on purpose
 

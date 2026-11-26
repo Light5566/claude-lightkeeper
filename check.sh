@@ -340,7 +340,38 @@ expect_in "session report: read and edit pointers counted apart" "read pointer .
 expect_in "session report picks the latest session" "^Session " "$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session 2>&1)"
 out=$(python3 "$here/lib/status.py" --vault "$tmp/vault" --session=nope 2>&1); rc=$?
 [ $rc -ne 0 ] && expect_in "session report explains an unknown session" "No session" "$out" || bad "session report explains an unknown session" "$out"
-expect_silent "silent for an uncovered repo" "" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
+expect_in "an uncovered repo gets the one-time notice" "no map covers this repo yet" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
+expect_silent "the notice is not repeated" "" "$(HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
+rm -f "$CLAUDE_VAULTS_REGISTRY-hinted.json"
+expect_silent "LIGHTKEEPER_QUIET hides the notice" "" "$(LIGHTKEEPER_QUIET=1 HOOK_PROJECT=$other hook session_start source=startup cwd=$other)"
+expect_silent "no notice outside a git checkout" "" "$(HOOK_PROJECT=$tmp hook session_start source=startup cwd=$tmp)"
+
+# --- first run: init with no arguments, the empty-vault line, doctor, forget
+fr="$tmp/fresh/shopfront"; mkdir -p "$fr/src" "$tmp/home"; git init -q -b main "$fr"
+git -C "$fr" config user.email t@example.com; git -C "$fr" config user.name t
+echo "x" > "$fr/src/a.py"; git -C "$fr" add -A; git -C "$fr" commit -q -m init
+out=$(cd "$fr" && HOME="$tmp/home" CLAUDE_PROJECT_DIR= python3 "$here/lib/init.py" --plan 2>&1)
+expect_in "init --plan names the defaults" "vaults/shopfront, named \"shopfront\", covering .*shopfront; and install" "$out"
+[ ! -e "$tmp/home/vaults" ] && ok "init --plan changes nothing" || bad "init --plan changes nothing" "$(ls "$tmp/home")"
+out=$(cd "$fr" && HOME="$tmp/home" CLAUDE_PROJECT_DIR= python3 "$here/lib/init.py" --no-git --git-hook 2>&1)
+expect_in "init with no path creates the default vault" "created .*home/vaults/shopfront" "$out"
+[ -x "$tmp/home/.local/bin/vault" ] && ok "init with no path installs the launcher" || bad "init with no path installs the launcher" "$out"
+expect_in "init ends by pointing at seed" "seed the first notes with /lightkeeper:seed" "$out"
+expect_in "init again says the checkout is covered" "already covered" "$(cd "$fr" && HOME="$tmp/home" CLAUDE_PROJECT_DIR= python3 "$here/lib/init.py" 2>&1)"
+expect_in "primer says an empty vault needs seeding" "no module notes yet" "$(HOOK_PROJECT=$fr hook session_start source=startup cwd=$fr session_id=$sid-fr)"
+grep -q "no module notes yet" <<<"$(hook session_start source=startup cwd=$repo session_id=$sid-fr2)" && bad "no seeding line once notes exist" "" || ok "no seeding line once notes exist"
+out=$(cd "$fr" && python3 "$here/bin/vault" doctor 2>&1); rc=$?
+[ $rc -eq 1 ] && expect_in "doctor says to seed an empty vault" "run /lightkeeper:seed" "$out" || bad "doctor says to seed an empty vault" "$out"
+out=$(cd "$repo" && python3 "$here/bin/vault" doctor 2>&1); rc=$?
+[ $rc -eq 0 ] && expect_in "doctor passes on a working setup" "covers this checkout as" "$out" || bad "doctor passes on a working setup" "$out"
+out=$(cd "$tmp" && CLAUDE_VAULTS_REGISTRY="$tmp/none" python3 "$here/bin/vault" doctor 2>&1); rc=$?
+[ $rc -eq 1 ] && expect_in "doctor names an empty registry" "no vault is registered" "$out" || bad "doctor names an empty registry" "$out"
+out=$(cd "$fr" && python3 "$here/lib/init.py" --forget 2>&1)
+expect_in "forget unregisters the vault" "unregistered .*vaults/shopfront" "$out"
+expect_in "forget removes our git hooks" "post-merge hook removed" "$out"
+[ -d "$tmp/home/vaults/shopfront/_meta" ] && ok "forget keeps the vault folder" || bad "forget keeps the vault folder" "$out"
+grep -q "$tmp/vault" "$CLAUDE_VAULTS_REGISTRY" && ok "forget leaves other vaults registered" || bad "forget leaves other vaults registered" "$(cat "$CLAUDE_VAULTS_REGISTRY")"
+rm -f "$CLAUDE_VAULTS_REGISTRY-hinted.json"
 expect_silent "garbage payload is a no-op" "" "$(printf '%s' "not json" | CLAUDE_PROJECT_DIR="$repo" python3 "$here/lib/hooks/run.py" prompt_hint 2>&1)"
 
 # --- launcher + log + sync

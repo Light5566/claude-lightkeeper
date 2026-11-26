@@ -102,7 +102,7 @@ def cli(sub):
     when present, otherwise the plugin's own script."""
     if shutil.which("vault"):
         return "vault " + sub
-    name = {"find": "find.py", "check": "check.py", "sync": "sync.py", "status": "status.py"}.get(sub.split()[0])
+    name = {"find": "find.py", "check": "check.py", "sync": "sync.py", "status": "status.py", "doctor": "doctor.py"}.get(sub.split()[0])
     if name:
         return ("python3 %s %s" % (PLUGIN_ROOT / "lib" / name, " ".join(sub.split()[1:]))).rstrip()
     return "vault " + sub
