@@ -2,6 +2,12 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## Unreleased
+
+### Changed
+- `SECURITY.md` added: how to report a vulnerability, and what the plugin does on your machine.
+- The GitHub Actions used by the PR comment action and the repo's own workflow are pinned to commit ids.
+
 ## 2.11.1 - 2026-11-26
 
 Found by running the 2.11.0 first-run path in a live Claude Code session on a fresh repo.
