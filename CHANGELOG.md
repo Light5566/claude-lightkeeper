@@ -2,6 +2,15 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
+## 2.11.1 - 2026-11-26
+
+Found by running the 2.11.0 first-run path in a live Claude Code session on a fresh repo.
+
+### Fixed
+- **A repo note no longer takes the file pointer from the module that owns a file.** A `type: repo` note that mentions a file in its text was indexed as an owner and, having more inbound links, ranked first. When another note claims the same file, the repo note now counts as a weak match for it, so the pointer, the Stop reminder and `vault sync` name the module. Found in a live Claude Code run of init and seed on a fresh repo.
+- The init command no longer promises a check result that init doesn't print.
+- `vault doctor` tells apart a launcher that isn't installed from one that is installed in `~/.local/bin` but not on your PATH, and gives the right line for each.
+
 ## 2.11.0 - 2026-11-26
 
 The first five minutes. A survey of eight similar tools and a walk through our own first run found too many decisions before the first note, silence when nothing was set up, and no way to check or undo the setup.
@@ -18,11 +27,6 @@ The first five minutes. A survey of eight similar tools and a walk through our o
 - **One order everywhere: init, seed, done.** The file pointer works in the same session once notes own files, so no restart is needed; the session primer shows from the next session. The README, the init command and init's last line now agree, and init offers to seed straight away.
 - **README.** The first screen is three lines to a working map and says nothing is written into your repo. Configuration, teams, keeping the map honest and branch notes moved to `docs/guide.md`; Hermes Agent and Codex to `docs/agents.md`. 3,483 words became 2,184. Same in 中文.
 - The Hermes and Codex install lines use the zero-argument `vault init`.
-
-### Fixed (26 Nov, after a walk through the first run)
-- **A repo note no longer takes the file pointer from the module that owns a file.** A `type: repo` note that mentions a file in its text was indexed as an owner and, having more inbound links, ranked first. When another note claims the same file, the repo note now counts as a weak match for it, so the pointer, the Stop reminder and `vault sync` name the module. Found in a live Claude Code run of init and seed on a fresh repo.
-- The init command no longer promises a check result that init doesn't print.
-- `vault doctor` tells apart a launcher that isn't installed from one that is installed in `~/.local/bin` but not on your PATH, and gives the right line for each.
 
 ## 2.10.0 - 2026-11-25
 
