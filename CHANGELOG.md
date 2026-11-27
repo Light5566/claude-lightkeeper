@@ -4,6 +4,10 @@ All notable changes to Lightkeeper, formerly claude-vault. The plugin version li
 
 ## Unreleased
 
+### Fixed
+- **A file at the top of a repo can be owned by a note.** A name with no `/` in a *Where it lives* table (`plugin.yaml`, `__init__.py`, `Makefile.json`) was read as a bare file name and never matched, so the file pointer, the Stop reminder, `vault sync` and the PR comment all treated such files as unowned. It now counts as a path when the file exists at the top of a covered checkout.
+- **A bare file name in a note's prose no longer resolves by note order.** The index read notes alphabetically and resolved a name like `hooks.json` against only the tables it had read so far, so a note could claim another note's file just by sorting between them. Tables are now read first for every note; a name two notes claim stays ambiguous.
+
 ### Changed
 - `SECURITY.md` added: how to report a vulnerability, and what the plugin does on your machine.
 - The GitHub Actions used by the PR comment action and the repo's own workflow are pinned to commit ids.

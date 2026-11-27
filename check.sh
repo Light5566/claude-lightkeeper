@@ -436,5 +436,21 @@ grep -q "composer.lock" <<<"$out" && bad "pr_notes skips noise files" "$out" || 
 out=$(python3 "$here/action/pr_notes.py" --vault "$tmp/nowhere" --files "$tmp/changed.txt" --repo "$repo" 2>&1); rc=$?
 [ $rc -eq 0 ] && expect_in "pr_notes never fails without a vault" "Could not read the vault" "$out" || bad "pr_notes never fails without a vault" "$out"
 
+# --- index: a file at the top of the repo can be owned; a bare file name in prose never
+#     resolves by note order
+mkn() { printf -- '---\ntype: module\nstatus: shipped\ndepth: stub\nrepo: shop\nupdated: 2026-01-01\ntags: [module]\n---\n\n# %s\n\n## What it is\n\n%s\n\n## Where it lives\n\n| Surface | Path |\n|---|---|\n%s\n\n## Connects to\n\n- [[Payment]] — test\n' "$1" "$2" "$3" > "$tmp/vault/2 Modules/$1.md"; }
+mkn "Version log" "The changelog." "| Log | \`CHANGELOG.md\` |"
+out=$(hook file_guard file_path=$repo/CHANGELOG.md cwd=$repo session_id=$sid-root)
+expect_in "a file at the top of the repo can be owned" 'vault note \\"Version log\\"' "$out"
+mkdir -p "$repo/routes/cfg" "$repo/app/cfg"; echo '{}' > "$repo/app/cfg/conf.json"; echo '{}' > "$repo/routes/cfg/conf.json"
+mkn "Alpha cfg" "One config." "| Config | \`app/cfg/conf.json\` |"
+mkn "Zulu cfg" "Another config." "| Config | \`routes/cfg/conf.json\` |"
+mkn "Mike notes" "Mentions \`conf.json\` in prose only." "| Code | \`app/Services/PaymentService.php\` |"
+out=$(hook file_guard file_path=$repo/app/cfg/conf.json cwd=$repo session_id=$sid-amb)
+expect_in "the table owner gets the pointer" 'Alpha cfg' "$out"
+grep -q "Mike notes" <<<"$out" && bad "an ambiguous bare file name in prose claims nothing" "$out" || ok "an ambiguous bare file name in prose claims nothing"
+rm -f "$tmp/vault/2 Modules/Version log.md" "$tmp/vault/2 Modules/Alpha cfg.md" "$tmp/vault/2 Modules/Zulu cfg.md" "$tmp/vault/2 Modules/Mike notes.md"
+rm -rf "$repo/app/cfg" "$repo/routes/cfg"
+
 [ $fail -eq 0 ] && echo "all checks passed" || echo "SOME CHECKS FAILED"
 exit $fail

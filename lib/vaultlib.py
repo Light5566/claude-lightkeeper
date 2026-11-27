@@ -346,17 +346,20 @@ def build_index(root=None):
     def add(mapping, key, stem):
         mapping.setdefault(key, set()).add(stem)
 
+    local_bases, all_claims = {}, {}
+    # Pass 1: every note's Where it lives table. Prose is read in pass 2, so a bare
+    # basename there resolves against every note's claims, not only the notes that
+    # happen to sort before it (`hooks.json` named by two notes stays ambiguous).
     for p in files:
         text = texts[p]
-        fm = metas[p]
         stem = p.stem
         rel = p.relative_to(root).as_posix()
         # _meta notes cite code paths as writing EXAMPLES — never as ownership.
         is_meta_note = rel.startswith("_meta/")
 
         # --- Where it lives table: the curated path/class source
-        local_base = {}  # basename -> qualified path within this note
-        claims = set()   # the author's explicit paths (check.py reports the ones that rot)
+        local_base = local_bases[p] = {}  # basename -> qualified path within this note
+        claims = all_claims[p] = set()    # the author's explicit paths (check.py reports the ones that rot)
         for section in [] if is_meta_note else WHERE_SECTION.findall(text):
             for line in section.splitlines():
                 if not line.lstrip().startswith("|"):
@@ -404,11 +407,27 @@ def build_index(root=None):
                                 add(paths, q, stem)
                                 local_base[val] = q
                                 add(global_basenames, val, q)
+                            elif checkouts and plausible(val):
+                                # a file at the top of a checkout (`plugin.yaml`, `__init__.py`):
+                                # it has no `/`, so it is only a path when it exists there
+                                claims.add(val)
+                                add(paths, val, stem)
+                                local_base[val] = val
+                                add(global_basenames, val, val)
                             cls = strip_ext(val)
                             if CLASSISH.match(cls):
                                 add(classes, cls, stem)
                         elif kind == "class":
                             add(classes, val, stem)
+
+    # Pass 2: prose paths, link edges and the note record.
+    for p in files:
+        text = texts[p]
+        fm = metas[p]
+        stem = p.stem
+        rel = p.relative_to(root).as_posix()
+        is_meta_note = rel.startswith("_meta/")
+        local_base, claims = local_bases[p], all_claims[p]
 
         # --- body code spans (outside fenced blocks): secondary path source
         for span in [] if is_meta_note else INLINE_SPAN.findall(strip_fences(text)):
