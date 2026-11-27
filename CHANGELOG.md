@@ -2,7 +2,9 @@
 
 All notable changes to Lightkeeper, formerly claude-vault. The plugin version lives in `.claude-plugin/plugin.json`.
 
-## Unreleased
+## 2.11.2 - 2026-11-27
+
+Two index fixes found while catching this project's own map up with its code, plus packaging work for the plugin directories.
 
 ### Fixed
 - **A file at the top of a repo can be owned by a note.** A name with no `/` in a *Where it lives* table (`plugin.yaml`, `__init__.py`, `Makefile.json`) was read as a bare file name and never matched, so the file pointer, the Stop reminder, `vault sync` and the PR comment all treated such files as unowned. It now counts as a path when the file exists at the top of a covered checkout.
@@ -10,7 +12,7 @@ All notable changes to Lightkeeper, formerly claude-vault. The plugin version li
 
 ### Changed
 - `SECURITY.md` added: how to report a vulnerability, and what the plugin does on your machine.
-- The GitHub Actions used by the PR comment action and the repo's own workflow are pinned to commit ids.
+- The GitHub Actions used by the PR comment action and the repo's own workflow are pinned to commit ids, and moved to `actions/checkout` 7.0.1 and `actions/github-script` 9.0.0 (checkout 4 warned that Node 20 is deprecated). The comment script needs no change for github-script 9.
 - The Codex manifest (`.codex-plugin/plugin.json`) gains author, homepage, repository, license, a category, a long description, capabilities, two starter prompts and an icon; the short description fits Codex's 30-character limit.
 - `.github/dependabot.yml` keeps the pinned Actions current (monthly). `.codexignore` lists files Codex has no use for.
 
